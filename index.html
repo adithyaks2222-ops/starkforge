@@ -3,1189 +3,2572 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STARKFORGE — Logic Gate Simulator</title>
-<meta name="description" content="Digital logic gate simulator with real-time Boolean algebra evaluation. Drag-and-drop gates, draw wires, evaluate circuits.">
+<title>Digital Logic Gate Simulator &amp; Academy</title>
+<meta name="description" content="Industrial-grade Digital Logic Gate Simulator, Theory Archives, and Assessment Proving Grounds.">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 :root {
-  --c-bg:        #060608;
-  --c-surface:   #0b0b0e;
-  --c-surface2:  #101014;
-  --c-border:    #18181e;
-  --c-border2:   #222228;
-  --c-text:      #c0c0cc;
-  --c-text-dim:  #505060;
-  --c-text-faint:#2c2c36;
-  --c-accent:    #00d4a0;
-  --c-accent-bg: rgba(0,212,160,0.06);
-  --c-red:       #d85060;
-  --c-red-bg:    rgba(216,80,96,0.06);
-  --sidebar-w:   258px;
-  --status-h:    34px;
+  --bg-main:       #121214;
+  --bg-panel:      #18181b;
+  --bg-elevated:   #222226;
+  --border-color:  #27272a;
+  --border-focus:  #3f3f46;
+  --text-primary:  #f4f4f5;
+  --text-secondary:#a1a1aa;
+  --text-muted:    #71717a;
+  --state-active:  #60a5fa;
+  --state-inactive:#3f3f46;
+  --state-error:   #ef4444;
+  --state-pass:    #60a5fa;
+  --topbar-h:      52px;
+  --statusbar-h:   48px;
+  --sidebar-w:     280px;
 }
 
 html, body {
-  width: 100%; height: 100%;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
-  background: var(--c-bg);
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: 13px;
-  color: var(--c-text);
+  background: var(--bg-main);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
+}
+
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
 }
 
 #app {
   display: flex;
+  flex-direction: column;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
 }
 
-/* ─── SIDEBAR ─────────────────────────────────────── */
-#sidebar {
+/* ─── GLOBAL TOP NAVIGATION BAR ───────────────────────── */
+#topbar {
+  height: var(--topbar-h);
+  min-height: var(--topbar-h);
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  user-select: none;
+  z-index: 50;
+  flex-shrink: 0;
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-title {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.topbar-nav {
+  display: flex;
+  height: 100%;
+  align-items: stretch;
+  gap: 6px;
+}
+
+.nav-tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.nav-tab-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.nav-tab-btn.active {
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--state-active);
+  font-weight: 600;
+}
+
+.topbar-meta {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ─── UNIFIED SPA VIEWS ───────────────────────────────── */
+.spa-view {
+  display: none;
+  width: 100%;
+  height: calc(100vh - var(--topbar-h));
+  overflow: hidden;
+}
+
+.spa-view.active {
+  display: flex;
+}
+
+/* ─── UNIFIED SIDEBAR ARCHITECTURE ────────────────────── */
+.panel-sidebar {
   width: var(--sidebar-w);
   min-width: var(--sidebar-w);
   height: 100%;
-  background: var(--c-surface);
-  border-right: 1px solid var(--c-border);
+  background: var(--bg-panel);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  user-select: none;
+  z-index: 10;
 }
 
-.sb-header {
-  padding: 14px 16px 12px;
-  border-bottom: 1px solid var(--c-border);
+.panel-sidebar.left {
+  border-right: 1px solid var(--border-color);
+}
+
+.panel-sidebar.right {
+  border-left: 1px solid var(--border-color);
+}
+
+.sidebar-header {
+  height: 50px;
+  min-height: 50px;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--border-color);
   display: flex;
-  align-items: baseline;
-  gap: 10px;
-  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.sb-logo {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  color: var(--c-accent);
+.sidebar-title {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
 }
 
-.sb-version {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  color: var(--c-text-faint);
-  letter-spacing: 0.06em;
-}
-
-.sb-body {
+.sidebar-scroll {
   flex: 1;
   overflow-y: auto;
-  overflow-x: hidden;
-  padding: 12px 8px;
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.sb-body::-webkit-scrollbar { width: 3px; }
-.sb-body::-webkit-scrollbar-track { background: transparent; }
-.sb-body::-webkit-scrollbar-thumb { background: var(--c-border2); }
-
-.sb-section {
-  margin-bottom: 4px;
-}
-
-.sb-group-label {
-  font-size: 10px;
+.section-label {
+  font-size: 14px;
   font-weight: 500;
-  letter-spacing: 0.14em;
-  color: var(--c-text-faint);
-  text-transform: uppercase;
-  padding: 8px 8px 5px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
   display: block;
 }
 
-/* Component button — looks like a real tool button, not a card */
-.comp-btn {
+.palette-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.palette-btn {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 12px;
   width: 100%;
-  padding: 6px 8px;
-  margin-bottom: 1px;
-  background: transparent;
-  border: none;
+  padding: 8px 12px;
+  background: var(--bg-main);
+  border: 1px solid var(--border-color);
   border-radius: 4px;
-  color: var(--c-text);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11.5px;
-  font-weight: 400;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  transition: background 0.1s;
   text-align: left;
-  user-select: none;
+  transition: background 0.15s, border-color 0.15s;
 }
 
-.comp-btn:hover {
-  background: var(--c-surface2);
+.palette-btn:hover {
+  background: var(--bg-elevated);
+  border-color: var(--border-focus);
 }
 
-.comp-btn:active {
-  background: var(--c-border);
-}
-
-/* The gate icon — a small precise schematic preview */
-.comp-btn svg {
-  flex-shrink: 0;
-  opacity: 0.65;
-}
-
-.comp-btn:hover svg { opacity: 1; }
-
-.comp-tag {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.comp-name { color: var(--c-text); font-size: 11.5px; }
-.comp-sub  { color: var(--c-text-dim); font-size: 10px; font-family: 'Inter', sans-serif; }
-
-/* Separator */
-.sb-sep {
-  height: 1px;
-  background: var(--c-border);
-  margin: 8px 8px;
-}
-
-/* Clear button */
-.clear-btn {
+.palette-icon {
+  width: 32px;
+  height: 22px;
   display: flex;
   align-items: center;
-  gap: 7px;
-  width: calc(100% - 16px);
-  margin: 0 8px;
-  padding: 6px 8px;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.palette-name {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.palette-sub {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.sidebar-footer {
+  padding: 14px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--bg-panel);
+}
+
+.btn-clear {
+  width: 100%;
+  padding: 9px 12px;
   background: transparent;
-  border: 1px solid var(--c-border2);
+  border: 1px solid var(--border-color);
   border-radius: 4px;
-  color: var(--c-text-dim);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  font-weight: 400;
-  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  transition: background 0.1s, border-color 0.1s, color 0.1s;
-  user-select: none;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 
-.clear-btn:hover {
-  background: var(--c-red-bg);
-  border-color: rgba(224,80,96,0.3);
-  color: var(--c-red);
+.btn-clear:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border-color: var(--border-focus);
 }
 
-.clear-btn:active { opacity: 0.75; }
-
-/* Keyboard shortcuts */
-.sb-shortcuts {
-  border-top: 1px solid var(--c-border);
-  padding: 10px 8px;
-  flex-shrink: 0;
-}
-
-.shortcut-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 3px 0;
-}
-
-.sc-key {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9.5px;
-  color: var(--c-text-dim);
-  background: var(--c-surface2);
-  border: 1px solid var(--c-border2);
-  border-radius: 3px;
-  padding: 1px 5px;
-  min-width: 52px;
-  text-align: center;
-  flex-shrink: 0;
-}
-
-.sc-desc {
-  font-size: 10px;
-  color: var(--c-text-faint);
-}
-
-/* ─── WORKSPACE ───────────────────────────────────── */
-#workspace {
-  flex: 1;
+.quick-guide {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.5;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  gap: 4px;
 }
 
-#canvas-wrap {
+.guide-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.guide-key {
+  color: var(--text-secondary);
+}
+
+/* ─── WORKSPACE & CANVAS ARCHITECTURE ─────────────────── */
+.canvas-workspace {
   flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-main);
+  overflow: hidden;
+  position: relative;
+}
+
+.canvas-viewport {
+  flex: 1;
+  width: 100%;
+  height: calc(100% - var(--statusbar-h));
   position: relative;
   overflow: hidden;
-  /*
-    Graph-paper grid: major lines every 80px, minor lines every 20px.
-    Pure white lines at very low opacity — no color tint.
-  */
-  background-color: #060608;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px),
-    linear-gradient(rgba(255,255,255,0.007) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.007) 1px, transparent 1px);
-  background-size: 80px 80px, 80px 80px, 20px 20px, 20px 20px;
 }
 
-
-#main-canvas {
-  position: absolute;
-  inset: 0;
+canvas.eda-canvas {
+  width: 100%;
+  height: 100%;
   display: block;
-  cursor: default;
+  cursor: crosshair;
 }
 
-/* ─── STATUS BAR ──────────────────────────────────── */
-#statusbar {
-  height: var(--status-h);
-  min-height: var(--status-h);
-  background: var(--c-surface);
-  border-top: 1px solid var(--c-border);
+/* ─── UNIFIED FIXED BOTTOM STATUSBAR ─────────────────── */
+.fixed-statusbar {
+  height: var(--statusbar-h);
+  min-height: var(--statusbar-h);
+  background: var(--bg-panel);
+  border-top: 1px solid var(--border-color);
   display: flex;
   align-items: center;
-  padding: 0 14px;
-  gap: 0;
-  flex-shrink: 0;
+  justify-content: space-between;
+  padding: 0 20px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  user-select: none;
+  z-index: 10;
+}
+
+.status-left-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-lead {
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  font-size: 14px;
+}
+
+.status-expression {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 11.5px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
 }
 
-.sb-seg {
+.status-indicator-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  background: var(--bg-main);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+}
+
+.status-indicator-tag.high {
+  color: var(--state-active);
+  border-color: var(--state-active);
+}
+
+.status-indicator-tag.low {
+  color: var(--text-secondary);
+}
+
+/* ─── VIEW 1: THEORY ARCHIVES (NOW 1ST) ───────────────── */
+#view-archives {
+  display: none;
+  width: 100%;
+  height: calc(100vh - var(--topbar-h));
+  background: var(--bg-main);
+}
+
+#view-archives.active {
+  display: flex;
+}
+
+.gate-menu-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gate-menu-btn {
+  width: 100%;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 12px 0 0;
-  margin-right: 12px;
-  border-right: 1px solid var(--c-border);
-}
-
-.sb-seg:last-child { border-right: none; margin-left: auto; padding-right: 0; }
-
-.sb-indicator {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--c-text-faint);
-  flex-shrink: 0;
-  transition: background 0.2s;
-}
-
-.sb-indicator.active { background: var(--c-accent); }
-
-#sb-label {
-  color: var(--c-text-faint);
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-#sb-eq {
-  color: var(--c-text);
-  font-size: 12px;
-  transition: color 0.15s;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 400px;
-}
-
-#sb-eq.active { color: var(--c-accent); }
-
-#sb-val {
-  font-size: 11px;
+  justify-content: space-between;
+  padding: 11px 14px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-size: 14px;
   font-weight: 500;
-  color: var(--c-text-faint);
-  transition: color 0.15s;
-  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 
-#sb-val.v1 { color: var(--c-accent); }
-#sb-val.v0 { color: var(--c-red); }
+.gate-menu-btn:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
 
-#sb-hint { color: var(--c-text-faint); font-size: 10px; letter-spacing: 0.04em; }
+.gate-menu-btn.active {
+  background: var(--bg-elevated);
+  border-color: var(--border-focus);
+  color: var(--state-active);
+  font-weight: 600;
+}
+
+.gate-menu-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.archives-dossier {
+  flex: 1;
+  height: 100%;
+  overflow-y: auto;
+  padding: 40px 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 1000px;
+}
+
+.dossier-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 24px;
+}
+
+.dossier-headline {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dossier-gate-title {
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.dossier-eq-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px;
+  color: var(--state-active);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  padding: 5px 12px;
+  border-radius: 4px;
+  align-self: flex-start;
+}
+
+.dossier-symbol-box {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 20px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 240px;
+}
+
+.symbol-meta {
+  margin-top: 10px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.dossier-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dossier-section-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.dossier-paragraph {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.table-card {
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--bg-panel);
+}
+
+.standard-truth-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  text-align: left;
+}
+
+.standard-truth-table th {
+  background: var(--bg-elevated);
+  padding: 12px 20px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.standard-truth-table td {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.standard-truth-table tr:last-child td {
+  border-bottom: none;
+}
+
+.standard-truth-table td.out-high {
+  color: var(--state-active);
+  font-weight: 600;
+}
+
+/* ─── VIEW 2: PROVING GROUNDS (NOW 2ND) ───────────────── */
+#view-proving {
+  display: none;
+  width: 100%;
+  height: calc(100vh - var(--topbar-h));
+}
+
+#view-proving.active {
+  display: flex;
+}
+
+.proving-dossier-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 14px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.card-block {
+  background: var(--bg-main);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.target-formula {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--state-active);
+  word-break: break-all;
+}
+
+.card-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.outcome-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.outcome-text.pass {
+  color: var(--state-pass);
+}
+
+.outcome-text.mismatch {
+  color: var(--state-error);
+}
+
+.outcome-detail {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.action-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.btn-action-primary {
+  width: 100%;
+  padding: 11px 14px;
+  background: var(--text-primary);
+  color: #121214;
+  border: 1px solid var(--text-primary);
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, background 0.15s;
+  text-align: center;
+}
+
+.btn-action-primary:hover {
+  background: #e4e4e7;
+}
+
+.btn-action-secondary {
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  text-align: center;
+}
+
+.btn-action-secondary:hover {
+  background: var(--bg-elevated);
+  border-color: var(--border-focus);
+}
+
+/* ─── VIEW 3: PRACTICE SANDBOX (NOW LAST ON LIST) ─────── */
+#view-practice {
+  display: none;
+  width: 100%;
+  height: calc(100vh - var(--topbar-h));
+}
+
+#view-practice.active {
+  display: flex;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-panel);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-focus);
+}
 </style>
 </head>
 <body>
 <div id="app">
 
-<!-- ─── SIDEBAR ─────────────────────────────────────── -->
-<aside id="sidebar">
-  <div class="sb-header">
-    <span class="sb-logo">STARKFORGE</span>
-    <span class="sb-version">v1.0</span>
-  </div>
-
-  <div class="sb-body">
-
-    <div class="sb-section">
-      <span class="sb-group-label">Inputs</span>
-
-      <button class="comp-btn" data-type="INPUT" data-label="A">
-        <svg width="32" height="18" viewBox="0 0 32 18" fill="none">
-          <circle cx="9" cy="9" r="8" stroke="#484858" stroke-width="1.2"/>
-          <text x="9" y="13" text-anchor="middle" fill="#606070" font-size="8" font-family="JetBrains Mono,monospace">A</text>
-          <line x1="17" y1="9" x2="32" y2="9" stroke="#484858" stroke-width="1" opacity="0.5"/>
-        </svg>
-        <span class="comp-tag">
-          <span class="comp-name">Input A</span>
-          <span class="comp-sub">Toggle 0 / 1</span>
-        </span>
-      </button>
-
-      <button class="comp-btn" data-type="INPUT" data-label="B">
-        <svg width="32" height="18" viewBox="0 0 32 18" fill="none">
-          <circle cx="9" cy="9" r="8" stroke="#484858" stroke-width="1.2"/>
-          <text x="9" y="13" text-anchor="middle" fill="#606070" font-size="8" font-family="JetBrains Mono,monospace">B</text>
-          <line x1="17" y1="9" x2="32" y2="9" stroke="#484858" stroke-width="1" opacity="0.5"/>
-        </svg>
-        <span class="comp-tag">
-          <span class="comp-name">Input B</span>
-          <span class="comp-sub">Toggle 0 / 1</span>
-        </span>
-      </button>
-
-      <button class="comp-btn" data-type="INPUT" data-label="C">
-        <svg width="32" height="18" viewBox="0 0 32 18" fill="none">
-          <circle cx="9" cy="9" r="8" stroke="#484858" stroke-width="1.2"/>
-          <text x="9" y="13" text-anchor="middle" fill="#606070" font-size="8" font-family="JetBrains Mono,monospace">C</text>
-          <line x1="17" y1="9" x2="32" y2="9" stroke="#484858" stroke-width="1" opacity="0.5"/>
-        </svg>
-        <span class="comp-tag">
-          <span class="comp-name">Input C</span>
-          <span class="comp-sub">Toggle 0 / 1</span>
-        </span>
-      </button>
+  <!-- ─── GLOBAL TOP NAVIGATION BAR (Theory Archives -> Proving Grounds -> Practice Sandbox) -->
+  <header id="topbar">
+    <div class="topbar-brand">
+      <span class="brand-title">Digital Logic Gate Simulator</span>
     </div>
+    <nav class="topbar-nav" id="topbar-nav">
+      <button class="nav-tab-btn active" data-view="archives">Theory Archives</button>
+      <button class="nav-tab-btn" data-view="proving">Proving Grounds</button>
+      <button class="nav-tab-btn" data-view="practice">Practice Sandbox</button>
+    </nav>
+    <div class="topbar-meta">EDA SUITE // 2026</div>
+  </header>
 
-    <div class="sb-sep"></div>
+  <!-- ─── VIEW 1: THEORY ARCHIVES (FIRST ON LIST) ─────────── -->
+  <section class="spa-view active" id="view-archives">
+    <aside class="panel-sidebar left">
+      <div class="sidebar-header">
+        <span class="sidebar-title">Logic Gate Directory</span>
+      </div>
+      <div class="sidebar-scroll">
+        <ul class="gate-menu-list" id="archives-menu-list">
+          <!-- Rendered dynamically -->
+        </ul>
+      </div>
+    </aside>
+    <main class="archives-dossier" id="archives-content">
+      <!-- Rendered dynamically -->
+    </main>
+  </section>
 
-    <div class="sb-section">
-      <span class="sb-group-label">Gates</span>
+  <!-- ─── VIEW 2: PROVING GROUNDS (SECOND ON LIST) ────────── -->
+  <section class="spa-view" id="view-proving">
+    <!-- Left Sidebar: Palette -->
+    <aside class="panel-sidebar left">
+      <div class="sidebar-header">
+        <span class="sidebar-title">Component Palette</span>
+      </div>
+      <div class="sidebar-scroll">
+        <div>
+          <span class="section-label">Input Terminals</span>
+          <div class="palette-grid">
+            <button class="palette-btn" data-canvas="proving" data-type="INPUT" data-label="A">
+              <span class="palette-icon">
+                <svg width="24" height="16" viewBox="0 0 24 16" fill="none">
+                  <rect x="2" y="2" width="14" height="12" rx="2" stroke="#a1a1aa" stroke-width="1.5"/>
+                  <text x="9" y="11" text-anchor="middle" fill="#f4f4f5" font-size="9" font-family="Inter">A</text>
+                  <line x1="16" y1="8" x2="24" y2="8" stroke="#a1a1aa" stroke-width="1.5"/>
+                </svg>
+              </span>
+              <span class="palette-name">Input A</span>
+            </button>
+            <button class="palette-btn" data-canvas="proving" data-type="INPUT" data-label="B">
+              <span class="palette-icon">
+                <svg width="24" height="16" viewBox="0 0 24 16" fill="none">
+                  <rect x="2" y="2" width="14" height="12" rx="2" stroke="#a1a1aa" stroke-width="1.5"/>
+                  <text x="9" y="11" text-anchor="middle" fill="#f4f4f5" font-size="9" font-family="Inter">B</text>
+                  <line x1="16" y1="8" x2="24" y2="8" stroke="#a1a1aa" stroke-width="1.5"/>
+                </svg>
+              </span>
+              <span class="palette-name">Input B</span>
+            </button>
+            <button class="palette-btn" data-canvas="proving" data-type="INPUT" data-label="C">
+              <span class="palette-icon">
+                <svg width="24" height="16" viewBox="0 0 24 16" fill="none">
+                  <rect x="2" y="2" width="14" height="12" rx="2" stroke="#a1a1aa" stroke-width="1.5"/>
+                  <text x="9" y="11" text-anchor="middle" fill="#f4f4f5" font-size="9" font-family="Inter">C</text>
+                  <line x1="16" y1="8" x2="24" y2="8" stroke="#a1a1aa" stroke-width="1.5"/>
+                </svg>
+              </span>
+              <span class="palette-name">Input C</span>
+            </button>
+          </div>
+        </div>
 
-      <button class="comp-btn" data-type="AND">
-        <svg width="32" height="18" viewBox="0 0 32 18" fill="none">
-          <path d="M2 2 L14 2 Q22 2 22 9 Q22 16 14 16 L2 16 Z" stroke="#c4c4d4" stroke-width="1.2" fill="none"/>
-          <line x1="0" y1="6" x2="2" y2="6" stroke="#c4c4d4" stroke-width="1" opacity="0.5"/>
-          <line x1="0" y1="12" x2="2" y2="12" stroke="#c4c4d4" stroke-width="1" opacity="0.5"/>
-          <line x1="22" y1="9" x2="32" y2="9" stroke="#c4c4d4" stroke-width="1" opacity="0.5"/>
-        </svg>
-        <span class="comp-tag">
-          <span class="comp-name">AND Gate</span>
-          <span class="comp-sub">Y = A·B</span>
-        </span>
-      </button>
+        <div>
+          <span class="section-label">Logic Gates</span>
+          <div class="palette-grid">
+            <button class="palette-btn" data-canvas="proving" data-type="AND">
+              <span class="palette-icon">
+                <svg width="24" height="16" viewBox="0 0 24 16" fill="none">
+                  <path d="M2 2 L12 2 Q20 2 20 8 Q20 14 12 14 L2 14 Z" stroke="#a1a1aa" stroke-width="1.5"/>
+                </svg>
+              </span>
+              <span class="palette-name">AND Gate</span>
+            </button>
+            <button class="palette-btn" data-canvas="proving" data-type="OR">
+              <span class="palette-icon">
+                <svg width="24" height="16" viewBox="0 0 24 16" fill="none">
+                  <path d="M2 2 Q6 8 2 14 Q12 14 20 8 Q12 2 2 2 Z" stroke="#a1a1aa" stroke-width="1.5"/>
+                </svg>
+              </span>
+              <span class="palette-name">OR Gate</span>
+            </button>
+            <button class="palette-btn" data-canvas="proving" data-type="NOT">
+              <span class="palette-icon">
+                <svg width="24" height="16" viewBox="0 0 24 16" fill="none">
+                  <path d="M2 2 L2 14 L16 8 Z" stroke="#a1a1aa" stroke-width="1.5"/>
+                  <circle cx="18.5" cy="8" r="2.5" stroke="#a1a1aa" stroke-width="1.5"/>
+                </svg>
+              </span>
+              <span class="palette-name">NOT Gate</span>
+            </button>
+            <button class="palette-btn" data-canvas="proving" data-type="NAND">
+              <span class="palette-icon">
+                <svg width="24" height="16" viewBox="0 0 24 16" fill="none">
+                  <path d="M2 2 L10 2 Q17 2 17 8 Q17 14 10 14 L2 14 Z" stroke="#a1a1aa" stroke-width="1.5"/>
+                  <circle cx="19.5" cy="8" r="2.5" stroke="#a1a1aa" stroke-width="1.5"/>
+                </svg>
+              </span>
+              <span class="palette-name">NAND Gate</span>
+            </button>
+            <button class="palette-btn" data-canvas="proving" data-type="NOR">
+              <span class="palette-icon">
+                <svg width="24" height="16" viewBox="0 0 24 16" fill="none">
+                  <path d="M2 2 Q5 8 2 14 Q10 14 17 8 Q10 2 2 2 Z" stroke="#a1a1aa" stroke-width="1.5"/>
+                  <circle cx="19.5" cy="8" r="2.5" stroke="#a1a1aa" stroke-width="1.5"/>
+                </svg>
+              </span>
+              <span class="palette-name">NOR Gate</span>
+            </button>
+            <button class="palette-btn" data-canvas="proving" data-type="XOR">
+              <span class="palette-icon">
+                <svg width="24" height="16" viewBox="0 0 24 16" fill="none">
+                  <path d="M1 2 Q4 8 1 14" stroke="#a1a1aa" stroke-width="1.5"/>
+                  <path d="M4 2 Q7 8 4 14 Q12 14 20 8 Q12 2 4 2 Z" stroke="#a1a1aa" stroke-width="1.5"/>
+                </svg>
+              </span>
+              <span class="palette-name">XOR Gate</span>
+            </button>
+          </div>
+        </div>
 
-      <button class="comp-btn" data-type="OR">
-        <svg width="32" height="18" viewBox="0 0 32 18" fill="none">
-          <path d="M2 2 Q5 9 2 16 Q10 16 18 9 Q10 2 2 2 Z" stroke="#c4c4d4" stroke-width="1.2" fill="none"/>
-          <line x1="0" y1="6" x2="4" y2="6" stroke="#c4c4d4" stroke-width="1" opacity="0.5"/>
-          <line x1="0" y1="12" x2="4" y2="12" stroke="#c4c4d4" stroke-width="1" opacity="0.5"/>
-          <line x1="18" y1="9" x2="32" y2="9" stroke="#c4c4d4" stroke-width="1" opacity="0.5"/>
-        </svg>
-        <span class="comp-tag">
-          <span class="comp-name">OR Gate</span>
-          <span class="comp-sub">Y = A+B</span>
-        </span>
-      </button>
+        <div>
+          <span class="section-label">Measurement</span>
+          <div class="palette-grid">
+            <button class="palette-btn" data-canvas="proving" data-type="OUTPUT">
+              <span class="palette-icon">
+                <svg width="24" height="16" viewBox="0 0 24 16" fill="none">
+                  <rect x="6" y="2" width="16" height="12" rx="2" stroke="#a1a1aa" stroke-width="1.5"/>
+                  <line x1="0" y1="8" x2="6" y2="8" stroke="#a1a1aa" stroke-width="1.5"/>
+                </svg>
+              </span>
+              <span class="palette-name">OUTPUT Probe</span>
+            </button>
+          </div>
+        </div>
+      </div>
 
-      <button class="comp-btn" data-type="NOT">
-        <svg width="32" height="18" viewBox="0 0 32 18" fill="none">
-          <path d="M2 2 L2 16 L18 9 Z" stroke="#c4c4d4" stroke-width="1.2" fill="none"/>
-          <circle cx="20" cy="9" r="2.5" stroke="#c4c4d4" stroke-width="1.2" fill="none"/>
-          <line x1="0" y1="9" x2="2" y2="9" stroke="#c4c4d4" stroke-width="1" opacity="0.5"/>
-          <line x1="22.5" y1="9" x2="32" y2="9" stroke="#c4c4d4" stroke-width="1" opacity="0.5"/>
-        </svg>
-        <span class="comp-tag">
-          <span class="comp-name">NOT Gate</span>
-          <span class="comp-sub">Y = A'</span>
-        </span>
-      </button>
+      <div class="sidebar-footer">
+        <button class="btn-clear" id="proving-btn-clear">Clear Canvas</button>
+      </div>
+    </aside>
 
-      <button class="comp-btn" data-type="NAND">
-        <svg width="32" height="18" viewBox="0 0 32 18" fill="none">
-          <path d="M2 2 L12 2 Q20 2 20 9 Q20 16 12 16 L2 16 Z" stroke="#c4c4d4" stroke-width="1.2" fill="none"/>
-          <circle cx="22.5" cy="9" r="2.5" stroke="#c4c4d4" stroke-width="1.2" fill="none"/>
-          <line x1="0" y1="6" x2="2" y2="6" stroke="#c4c4d4" stroke-width="1" opacity="0.5"/>
-          <line x1="0" y1="12" x2="2" y2="12" stroke="#c4c4d4" stroke-width="1" opacity="0.5"/>
-          <line x1="25" y1="9" x2="32" y2="9" stroke="#c4c4d4" stroke-width="1" opacity="0.5"/>
-        </svg>
-        <span class="comp-tag">
-          <span class="comp-name">NAND Gate</span>
-          <span class="comp-sub">Y = (A·B)'</span>
-        </span>
-      </button>
+    <!-- Center Canvas Workspace -->
+    <main class="canvas-workspace">
+      <div class="canvas-viewport" id="proving-canvas-wrap">
+        <canvas class="eda-canvas" id="proving-canvas"></canvas>
+      </div>
+      <footer class="fixed-statusbar">
+        <div class="status-left-group">
+          <span class="status-lead">CIRCUIT EQUATION:</span>
+          <span class="status-expression" id="proving-status-eq">No output connected</span>
+        </div>
+        <div class="status-right-group">
+          <span class="status-indicator-tag" id="proving-status-val">VALUE: &mdash;</span>
+        </div>
+      </footer>
+    </main>
 
-      <button class="comp-btn" data-type="NOR">
-        <svg width="32" height="18" viewBox="0 0 32 18" fill="none">
-          <path d="M2 2 Q5 9 2 16 Q9 16 16 9 Q9 2 2 2 Z" stroke="#c4c4d4" stroke-width="1.2" fill="none"/>
-          <circle cx="18.5" cy="9" r="2.5" stroke="#c4c4d4" stroke-width="1.2" fill="none"/>
-          <line x1="0" y1="6" x2="3.5" y2="6" stroke="#c4c4d4" stroke-width="1" opacity="0.5"/>
-          <line x1="0" y1="12" x2="3.5" y2="12" stroke="#c4c4d4" stroke-width="1" opacity="0.5"/>
-          <line x1="21" y1="9" x2="32" y2="9" stroke="#c4c4d4" stroke-width="1" opacity="0.5"/>
-        </svg>
-        <span class="comp-tag">
-          <span class="comp-name">NOR Gate</span>
-          <span class="comp-sub">Y = (A+B)'</span>
-        </span>
-      </button>
+    <!-- Right Sidebar: Assessment Target & Verification -->
+    <aside class="panel-sidebar right">
+      <div class="sidebar-header">
+        <span class="sidebar-title">Assessment Target</span>
+      </div>
+      <div class="proving-dossier-panel">
+        <div class="card-block">
+          <span class="card-label">Target Sequence</span>
+          <div class="target-formula" id="proving-target-eq">(A &middot; B) + C</div>
+          <p class="card-desc">
+            Assemble logic gates on the canvas to synthesize this Boolean function.
+          </p>
+        </div>
 
-      <button class="comp-btn" data-type="XOR">
-        <svg width="32" height="18" viewBox="0 0 32 18" fill="none">
-          <path d="M4 2 Q7 9 4 16 Q12 16 19 9 Q12 2 4 2 Z" stroke="#c4c4d4" stroke-width="1.2" fill="none"/>
-          <path d="M1.5 2 Q4.5 9 1.5 16" stroke="#c4c4d4" stroke-width="1.2" fill="none"/>
-          <line x1="0" y1="6" x2="5.5" y2="6" stroke="#c4c4d4" stroke-width="1" opacity="0.5"/>
-          <line x1="0" y1="12" x2="5.5" y2="12" stroke="#c4c4d4" stroke-width="1" opacity="0.5"/>
-          <line x1="19" y1="9" x2="32" y2="9" stroke="#c4c4d4" stroke-width="1" opacity="0.5"/>
-        </svg>
-        <span class="comp-tag">
-          <span class="comp-name">XOR Gate</span>
-          <span class="comp-sub">Y = A⊕B</span>
-        </span>
-      </button>
-    </div>
+        <div class="card-block">
+          <span class="card-label">Verification Telemetry</span>
+          <div class="outcome-text" id="proving-status-result">Ready for verification</div>
+          <div class="outcome-detail" id="proving-status-detail">
+            Wire inputs through gates to the output probe, then run verification.
+          </div>
+        </div>
 
-    <div class="sb-sep"></div>
+        <div class="action-row">
+          <button class="btn-action-primary" id="btn-proving-verify">Verify Circuit</button>
+          <button class="btn-action-secondary" id="btn-proving-new">Generate New Sequence</button>
+        </div>
+      </div>
+    </aside>
+  </section>
 
-    <div class="sb-section">
-      <span class="sb-group-label">Output</span>
+  <!-- ─── VIEW 3: PRACTICE SANDBOX (LAST ON LIST) ─────────── -->
+  <section class="spa-view" id="view-practice">
+    <!-- Left Sidebar: Palette -->
+    <aside class="panel-sidebar left">
+      <div class="sidebar-header">
+        <span class="sidebar-title">Components</span>
+      </div>
+      <div class="sidebar-scroll">
+        <div>
+          <span class="section-label">Input Terminals</span>
+          <div class="palette-grid">
+            <button class="palette-btn" data-canvas="practice" data-type="INPUT" data-label="A">
+              <span class="palette-icon">
+                <svg width="24" height="16" viewBox="0 0 24 16" fill="none">
+                  <rect x="2" y="2" width="14" height="12" rx="2" stroke="#a1a1aa" stroke-width="1.5"/>
+                  <text x="9" y="11" text-anchor="middle" fill="#f4f4f5" font-size="9" font-family="Inter">A</text>
+                  <line x1="16" y1="8" x2="24" y2="8" stroke="#a1a1aa" stroke-width="1.5"/>
+                </svg>
+              </span>
+              <span class="palette-name">Input A</span>
+              <span class="palette-sub">Toggle</span>
+            </button>
+            <button class="palette-btn" data-canvas="practice" data-type="INPUT" data-label="B">
+              <span class="palette-icon">
+                <svg width="24" height="16" viewBox="0 0 24 16" fill="none">
+                  <rect x="2" y="2" width="14" height="12" rx="2" stroke="#a1a1aa" stroke-width="1.5"/>
+                  <text x="9" y="11" text-anchor="middle" fill="#f4f4f5" font-size="9" font-family="Inter">B</text>
+                  <line x1="16" y1="8" x2="24" y2="8" stroke="#a1a1aa" stroke-width="1.5"/>
+                </svg>
+              </span>
+              <span class="palette-name">Input B</span>
+              <span class="palette-sub">Toggle</span>
+            </button>
+            <button class="palette-btn" data-canvas="practice" data-type="INPUT" data-label="C">
+              <span class="palette-icon">
+                <svg width="24" height="16" viewBox="0 0 24 16" fill="none">
+                  <rect x="2" y="2" width="14" height="12" rx="2" stroke="#a1a1aa" stroke-width="1.5"/>
+                  <text x="9" y="11" text-anchor="middle" fill="#f4f4f5" font-size="9" font-family="Inter">C</text>
+                  <line x1="16" y1="8" x2="24" y2="8" stroke="#a1a1aa" stroke-width="1.5"/>
+                </svg>
+              </span>
+              <span class="palette-name">Input C</span>
+              <span class="palette-sub">Toggle</span>
+            </button>
+          </div>
+        </div>
 
-      <button class="comp-btn" data-type="OUTPUT">
-        <svg width="32" height="18" viewBox="0 0 32 18" fill="none">
-          <circle cx="23" cy="9" r="8" stroke="#c4c4d4" stroke-width="1.2" fill="none" opacity="0.6"/>
-          <circle cx="23" cy="9" r="4" stroke="#c4c4d4" stroke-width="1" fill="none" opacity="0.3"/>
-          <line x1="0" y1="9" x2="15" y2="9" stroke="#c4c4d4" stroke-width="1" opacity="0.4"/>
-        </svg>
-        <span class="comp-tag">
-          <span class="comp-name">Output Node</span>
-          <span class="comp-sub">Probe — shows result</span>
-        </span>
-      </button>
-    </div>
+        <div>
+          <span class="section-label">Logic Gates</span>
+          <div class="palette-grid">
+            <button class="palette-btn" data-canvas="practice" data-type="AND">
+              <span class="palette-icon">
+                <svg width="24" height="16" viewBox="0 0 24 16" fill="none">
+                  <path d="M2 2 L12 2 Q20 2 20 8 Q20 14 12 14 L2 14 Z" stroke="#a1a1aa" stroke-width="1.5"/>
+                </svg>
+              </span>
+              <span class="palette-name">AND Gate</span>
+              <span class="palette-sub">A &middot; B</span>
+            </button>
+            <button class="palette-btn" data-canvas="practice" data-type="OR">
+              <span class="palette-icon">
+                <svg width="24" height="16" viewBox="0 0 24 16" fill="none">
+                  <path d="M2 2 Q6 8 2 14 Q12 14 20 8 Q12 2 2 2 Z" stroke="#a1a1aa" stroke-width="1.5"/>
+                </svg>
+              </span>
+              <span class="palette-name">OR Gate</span>
+              <span class="palette-sub">A + B</span>
+            </button>
+            <button class="palette-btn" data-canvas="practice" data-type="NOT">
+              <span class="palette-icon">
+                <svg width="24" height="16" viewBox="0 0 24 16" fill="none">
+                  <path d="M2 2 L2 14 L16 8 Z" stroke="#a1a1aa" stroke-width="1.5"/>
+                  <circle cx="18.5" cy="8" r="2.5" stroke="#a1a1aa" stroke-width="1.5"/>
+                </svg>
+              </span>
+              <span class="palette-name">NOT Gate</span>
+              <span class="palette-sub">Invert</span>
+            </button>
+            <button class="palette-btn" data-canvas="practice" data-type="NAND">
+              <span class="palette-icon">
+                <svg width="24" height="16" viewBox="0 0 24 16" fill="none">
+                  <path d="M2 2 L10 2 Q17 2 17 8 Q17 14 10 14 L2 14 Z" stroke="#a1a1aa" stroke-width="1.5"/>
+                  <circle cx="19.5" cy="8" r="2.5" stroke="#a1a1aa" stroke-width="1.5"/>
+                </svg>
+              </span>
+              <span class="palette-name">NAND Gate</span>
+              <span class="palette-sub">(A &middot; B)'</span>
+            </button>
+            <button class="palette-btn" data-canvas="practice" data-type="NOR">
+              <span class="palette-icon">
+                <svg width="24" height="16" viewBox="0 0 24 16" fill="none">
+                  <path d="M2 2 Q5 8 2 14 Q10 14 17 8 Q10 2 2 2 Z" stroke="#a1a1aa" stroke-width="1.5"/>
+                  <circle cx="19.5" cy="8" r="2.5" stroke="#a1a1aa" stroke-width="1.5"/>
+                </svg>
+              </span>
+              <span class="palette-name">NOR Gate</span>
+              <span class="palette-sub">(A + B)'</span>
+            </button>
+            <button class="palette-btn" data-canvas="practice" data-type="XOR">
+              <span class="palette-icon">
+                <svg width="24" height="16" viewBox="0 0 24 16" fill="none">
+                  <path d="M1 2 Q4 8 1 14" stroke="#a1a1aa" stroke-width="1.5"/>
+                  <path d="M4 2 Q7 8 4 14 Q12 14 20 8 Q12 2 4 2 Z" stroke="#a1a1aa" stroke-width="1.5"/>
+                </svg>
+              </span>
+              <span class="palette-name">XOR Gate</span>
+              <span class="palette-sub">A &oplus; B</span>
+            </button>
+            <button class="palette-btn" data-canvas="practice" data-type="XNOR">
+              <span class="palette-icon">
+                <svg width="24" height="16" viewBox="0 0 24 16" fill="none">
+                  <path d="M1 2 Q4 8 1 14" stroke="#a1a1aa" stroke-width="1.5"/>
+                  <path d="M4 2 Q7 8 4 14 Q10 14 17 8 Q10 2 2 2 Z" stroke="#a1a1aa" stroke-width="1.5"/>
+                  <circle cx="19.5" cy="8" r="2.5" stroke="#a1a1aa" stroke-width="1.5"/>
+                </svg>
+              </span>
+              <span class="palette-name">XNOR Gate</span>
+              <span class="palette-sub">(A &oplus; B)'</span>
+            </button>
+          </div>
+        </div>
 
-    <div class="sb-sep"></div>
+        <div>
+          <span class="section-label">Measurement</span>
+          <div class="palette-grid">
+            <button class="palette-btn" data-canvas="practice" data-type="OUTPUT">
+              <span class="palette-icon">
+                <svg width="24" height="16" viewBox="0 0 24 16" fill="none">
+                  <rect x="6" y="2" width="16" height="12" rx="2" stroke="#a1a1aa" stroke-width="1.5"/>
+                  <line x1="0" y1="8" x2="6" y2="8" stroke="#a1a1aa" stroke-width="1.5"/>
+                </svg>
+              </span>
+              <span class="palette-name">OUTPUT Probe</span>
+              <span class="palette-sub">Probe Y</span>
+            </button>
+          </div>
+        </div>
+      </div>
 
-    <button class="clear-btn" id="btn-clear">
-      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-        <path d="M1.5 1.5L8.5 8.5M8.5 1.5L1.5 8.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-      </svg>
-      Clear All
-    </button>
+      <div class="sidebar-footer">
+        <button class="btn-clear" id="practice-btn-clear">Clear Workspace</button>
+        <div class="quick-guide">
+          <div class="guide-row"><span class="guide-key">Left-click input</span><span>Toggle state (0/1)</span></div>
+          <div class="guide-row"><span class="guide-key">Drag output pin</span><span>Draw wire</span></div>
+          <div class="guide-row"><span class="guide-key">Right-click gate</span><span>Delete component</span></div>
+          <div class="guide-row"><span class="guide-key">Right-click pin</span><span>Disconnect wire</span></div>
+        </div>
+      </div>
+    </aside>
 
-  </div><!-- /sb-body -->
+    <!-- Main Workspace -->
+    <main class="canvas-workspace">
+      <div class="canvas-viewport" id="practice-canvas-wrap">
+        <canvas class="eda-canvas" id="practice-canvas"></canvas>
+      </div>
+      <footer class="fixed-statusbar">
+        <div class="status-left-group">
+          <span class="status-lead">EQUATION:</span>
+          <span class="status-expression" id="practice-status-eq">No output connected</span>
+        </div>
+        <div class="status-right-group">
+          <span class="status-indicator-tag" id="practice-status-val">VALUE: &mdash;</span>
+        </div>
+      </footer>
+    </main>
+  </section>
 
-  <div class="sb-shortcuts">
-    <div class="shortcut-row">
-      <span class="sc-key">click</span>
-      <span class="sc-desc">Toggle input / drag node</span>
-    </div>
-    <div class="shortcut-row">
-      <span class="sc-key">port+drag</span>
-      <span class="sc-desc">Draw wire from output</span>
-    </div>
-    <div class="shortcut-row">
-      <span class="sc-key">r-click</span>
-      <span class="sc-desc">Delete node or wire</span>
-    </div>
-    <div class="shortcut-row">
-      <span class="sc-key">r-click port</span>
-      <span class="sc-desc">Disconnect wire</span>
-    </div>
-  </div>
-
-</aside>
-
-<!-- ─── WORKSPACE ──────────────────────────────────── -->
-<main id="workspace">
-  <div id="canvas-wrap">
-    <canvas id="main-canvas"></canvas>
-  </div>
-
-  <div id="statusbar">
-    <div class="sb-seg">
-      <div class="sb-indicator" id="sb-dot"></div>
-      <span id="sb-label">EQ</span>
-    </div>
-    <div class="sb-seg" style="flex:1; border-right: none; margin-right: 0;">
-      <span id="sb-eq">No output connected</span>
-    </div>
-    <div class="sb-seg">
-      <span id="sb-val"></span>
-    </div>
-    <div class="sb-seg" style="border-right: none; margin-right: 0; padding-right: 0;">
-      <span id="sb-hint">STARKFORGE · Logic Gate Simulator</span>
-    </div>
-  </div>
-</main>
-
-</div><!-- /app -->
+</div>
 
 <script>
-(function () {
-'use strict';
-
-// ─── CONSTANTS ──────────────────────────────────────────────────────────────
-// Gate dimensions
-const GW = 80, GH = 52;          // gate body width / height
-const IN_R  = 24;                  // input node radius
-const OUT_R = 28;                  // output node radius
-const PR    = 5;                   // port circle radius (drawn)
-const PH    = 13;                  // port hit radius
-const SNAP  = 48;                  // wire snap distance
-const DT    = 4;                   // drag threshold (px)
-const NAND_OR_OFFSET = 8;          // bubble offset for NAND/NOR
-
-// Drawing colors — NO glow on inactive, glow only on high state
-const C = {
-  bg:       '#060608',
-  wire0:    '#1e1e24',             // inactive wire: dim, neutral
-  wire1:    '#00d4a0',             // active wire: accent
-  wireTmp:  'rgba(0,212,160,0.4)',
-
-  // Inactive node
-  fill:     '#0c0c10',
-  stroke0:  '#323238',
-  text0:    '#888898',
-
-  // Active node (state = 1)
-  stroke1:  '#00d4a0',
-  text1:    '#00d4a0',
-
-  port0:    '#2c2c32',
-  portFill0:'rgba(255,255,255,0.025)',
-  port1:    '#00d4a0',
-  portFill1:'rgba(0,212,160,0.1)',
-
-  redText:  '#d85060',
-};
-
-// ─── STATE ──────────────────────────────────────────────────────────────────
-let nodes = [], wires = [], uid = 1, drag = null;
-let W = 0, H = 0;
-
-const canvas = document.getElementById('main-canvas');
-const ctx    = canvas.getContext('2d');
-const sbDot  = document.getElementById('sb-dot');
-const sbEq   = document.getElementById('sb-eq');
-const sbVal  = document.getElementById('sb-val');
-
-// ─── NODE FACTORY ───────────────────────────────────────────────────────────
-function mkNode(type, label, x, y) {
-  const n = { id: uid++, type, label: label || type, x, y, state: 0, expr: null };
-  if (type === 'INPUT') { n.state = 0; n.expr = label || 'IN'; }
-  return n;
-}
-
-// ─── PORT GEOMETRY ──────────────────────────────────────────────────────────
-// Returns array of { x, y, kind:'in'|'out', idx }
-function getPorts(node) {
-  const { x, y, type } = node;
-  switch (type) {
-    case 'INPUT':
-      return [{ x: x + IN_R,  y, kind:'out', idx:0 }];
-    case 'OUTPUT':
-      return [{ x: x - OUT_R, y, kind:'in',  idx:0 }];
-    case 'NOT':
-      return [
-        { x: x - GW/2, y, kind:'in',  idx:0 },
-        { x: x + GW/2, y, kind:'out', idx:0 },
-      ];
-    case 'NAND':
-      return [
-        { x: x - GW/2, y: y - GH*0.22, kind:'in',  idx:0 },
-        { x: x - GW/2, y: y + GH*0.22, kind:'in',  idx:1 },
-        { x: x + GW/2, y,               kind:'out', idx:0 },
-      ];
-    case 'NOR':
-      return [
-        { x: x - GW/2, y: y - GH*0.22, kind:'in',  idx:0 },
-        { x: x - GW/2, y: y + GH*0.22, kind:'in',  idx:1 },
-        { x: x + GW/2, y,               kind:'out', idx:0 },
-      ];
-    case 'AND':
-    case 'OR':
-    case 'XOR':
-      return [
-        { x: x - GW/2, y: y - GH*0.22, kind:'in',  idx:0 },
-        { x: x - GW/2, y: y + GH*0.22, kind:'in',  idx:1 },
-        { x: x + GW/2, y,               kind:'out', idx:0 },
-      ];
-    default:
-      return [];
+/* ─────────────────────────────────────────────────────────
+   THEORY ARCHIVES DATA
+   ───────────────────────────────────────────────────────── */
+const GATE_ARCHIVES = [
+  {
+    id: 'AND',
+    name: 'AND Gate',
+    expression: 'Y = A &middot; B',
+    description: 'The AND gate produces a HIGH output (1) only if all of its inputs are HIGH (1). If any input is LOW (0), the output remains LOW. In digital logic, this corresponds to logical conjunction.',
+    inputs: ['A', 'B'],
+    table: [
+      { a: 0, b: 0, out: 0 },
+      { a: 0, b: 1, out: 0 },
+      { a: 1, b: 0, out: 0 },
+      { a: 1, b: 1, out: 1 }
+    ],
+    svg: `<svg width="120" height="70" viewBox="0 0 120 70" fill="none">
+      <line x1="10" y1="22" x2="40" y2="22" stroke="#a1a1aa" stroke-width="2"/>
+      <line x1="10" y1="48" x2="40" y2="48" stroke="#a1a1aa" stroke-width="2"/>
+      <path d="M40 10 L68 10 Q98 10 98 35 Q98 60 68 60 L40 60 Z" stroke="#a1a1aa" stroke-width="2" fill="#18181b"/>
+      <line x1="98" y1="35" x2="115" y2="35" stroke="#a1a1aa" stroke-width="2"/>
+      <text x="5" y="26" fill="#a1a1aa" font-size="12" font-family="Inter">A</text>
+      <text x="5" y="52" fill="#a1a1aa" font-size="12" font-family="Inter">B</text>
+      <text x="117" y="39" fill="#a1a1aa" font-size="12" font-family="Inter">Y</text>
+    </svg>`
+  },
+  {
+    id: 'OR',
+    name: 'OR Gate',
+    expression: 'Y = A + B',
+    description: 'The OR gate produces a HIGH output (1) if at least one of its inputs is HIGH (1). It outputs LOW (0) only when all inputs are LOW. This corresponds to logical disjunction.',
+    inputs: ['A', 'B'],
+    table: [
+      { a: 0, b: 0, out: 0 },
+      { a: 0, b: 1, out: 1 },
+      { a: 1, b: 0, out: 1 },
+      { a: 1, b: 1, out: 1 }
+    ],
+    svg: `<svg width="120" height="70" viewBox="0 0 120 70" fill="none">
+      <line x1="10" y1="22" x2="46" y2="22" stroke="#a1a1aa" stroke-width="2"/>
+      <line x1="10" y1="48" x2="46" y2="48" stroke="#a1a1aa" stroke-width="2"/>
+      <path d="M40 10 Q54 35 40 60 Q70 60 98 35 Q70 10 40 10 Z" stroke="#a1a1aa" stroke-width="2" fill="#18181b"/>
+      <line x1="98" y1="35" x2="115" y2="35" stroke="#a1a1aa" stroke-width="2"/>
+      <text x="5" y="26" fill="#a1a1aa" font-size="12" font-family="Inter">A</text>
+      <text x="5" y="52" fill="#a1a1aa" font-size="12" font-family="Inter">B</text>
+      <text x="117" y="39" fill="#a1a1aa" font-size="12" font-family="Inter">Y</text>
+    </svg>`
+  },
+  {
+    id: 'NOT',
+    name: 'NOT Gate',
+    expression: "Y = A'",
+    description: 'The NOT gate, or inverter, produces the logical complement of its input. When the input is LOW (0), the output is HIGH (1), and when the input is HIGH (1), the output is LOW (0).',
+    inputs: ['A'],
+    table: [
+      { a: 0, out: 1 },
+      { a: 1, out: 0 }
+    ],
+    svg: `<svg width="120" height="70" viewBox="0 0 120 70" fill="none">
+      <line x1="10" y1="35" x2="40" y2="35" stroke="#a1a1aa" stroke-width="2"/>
+      <path d="M40 15 L40 55 L84 35 Z" stroke="#a1a1aa" stroke-width="2" fill="#18181b"/>
+      <circle cx="89" cy="35" r="5" stroke="#a1a1aa" stroke-width="2" fill="#18181b"/>
+      <line x1="94" y1="35" x2="115" y2="35" stroke="#a1a1aa" stroke-width="2"/>
+      <text x="5" y="39" fill="#a1a1aa" font-size="12" font-family="Inter">A</text>
+      <text x="117" y="39" fill="#a1a1aa" font-size="12" font-family="Inter">Y</text>
+    </svg>`
+  },
+  {
+    id: 'NAND',
+    name: 'NAND Gate',
+    expression: "Y = (A &middot; B)'",
+    description: 'The NAND (NOT-AND) gate is functionally complete; all other digital logic gates can be constructed from combinations of NAND gates. It outputs LOW (0) only if all inputs are HIGH (1).',
+    inputs: ['A', 'B'],
+    table: [
+      { a: 0, b: 0, out: 1 },
+      { a: 0, b: 1, out: 1 },
+      { a: 1, b: 0, out: 1 },
+      { a: 1, b: 1, out: 0 }
+    ],
+    svg: `<svg width="120" height="70" viewBox="0 0 120 70" fill="none">
+      <line x1="10" y1="22" x2="40" y2="22" stroke="#a1a1aa" stroke-width="2"/>
+      <line x1="10" y1="48" x2="40" y2="48" stroke="#a1a1aa" stroke-width="2"/>
+      <path d="M40 10 L64 10 Q92 10 92 35 Q92 60 64 60 L40 60 Z" stroke="#a1a1aa" stroke-width="2" fill="#18181b"/>
+      <circle cx="97" cy="35" r="5" stroke="#a1a1aa" stroke-width="2" fill="#18181b"/>
+      <line x1="102" y1="35" x2="115" y2="35" stroke="#a1a1aa" stroke-width="2"/>
+      <text x="5" y="26" fill="#a1a1aa" font-size="12" font-family="Inter">A</text>
+      <text x="5" y="52" fill="#a1a1aa" font-size="12" font-family="Inter">B</text>
+      <text x="117" y="39" fill="#a1a1aa" font-size="12" font-family="Inter">Y</text>
+    </svg>`
+  },
+  {
+    id: 'NOR',
+    name: 'NOR Gate',
+    expression: "Y = (A + B)'",
+    description: 'The NOR (NOT-OR) gate is also functionally complete. It outputs HIGH (1) only when all of its inputs are LOW (0). Any HIGH input forces the output LOW.',
+    inputs: ['A', 'B'],
+    table: [
+      { a: 0, b: 0, out: 1 },
+      { a: 0, b: 1, out: 0 },
+      { a: 1, b: 0, out: 0 },
+      { a: 1, b: 1, out: 0 }
+    ],
+    svg: `<svg width="120" height="70" viewBox="0 0 120 70" fill="none">
+      <line x1="10" y1="22" x2="46" y2="22" stroke="#a1a1aa" stroke-width="2"/>
+      <line x1="10" y1="48" x2="46" y2="48" stroke="#a1a1aa" stroke-width="2"/>
+      <path d="M40 10 Q54 35 40 60 Q68 60 92 35 Q68 10 40 10 Z" stroke="#a1a1aa" stroke-width="2" fill="#18181b"/>
+      <circle cx="97" cy="35" r="5" stroke="#a1a1aa" stroke-width="2" fill="#18181b"/>
+      <line x1="102" y1="35" x2="115" y2="35" stroke="#a1a1aa" stroke-width="2"/>
+      <text x="5" y="26" fill="#a1a1aa" font-size="12" font-family="Inter">A</text>
+      <text x="5" y="52" fill="#a1a1aa" font-size="12" font-family="Inter">B</text>
+      <text x="117" y="39" fill="#a1a1aa" font-size="12" font-family="Inter">Y</text>
+    </svg>`
+  },
+  {
+    id: 'XOR',
+    name: 'XOR Gate',
+    expression: 'Y = A &oplus; B',
+    description: 'The Exclusive-OR gate outputs HIGH (1) if an odd number of inputs are HIGH (for two inputs, when the inputs differ). It outputs LOW (0) when both inputs are identical.',
+    inputs: ['A', 'B'],
+    table: [
+      { a: 0, b: 0, out: 0 },
+      { a: 0, b: 1, out: 1 },
+      { a: 1, b: 0, out: 1 },
+      { a: 1, b: 1, out: 0 }
+    ],
+    svg: `<svg width="120" height="70" viewBox="0 0 120 70" fill="none">
+      <line x1="10" y1="22" x2="48" y2="22" stroke="#a1a1aa" stroke-width="2"/>
+      <line x1="10" y1="48" x2="48" y2="48" stroke="#a1a1aa" stroke-width="2"/>
+      <path d="M34 10 Q48 35 34 60" stroke="#a1a1aa" stroke-width="2"/>
+      <path d="M42 10 Q56 35 42 60 Q72 60 98 35 Q72 10 42 10 Z" stroke="#a1a1aa" stroke-width="2" fill="#18181b"/>
+      <line x1="98" y1="35" x2="115" y2="35" stroke="#a1a1aa" stroke-width="2"/>
+      <text x="5" y="26" fill="#a1a1aa" font-size="12" font-family="Inter">A</text>
+      <text x="5" y="52" fill="#a1a1aa" font-size="12" font-family="Inter">B</text>
+      <text x="117" y="39" fill="#a1a1aa" font-size="12" font-family="Inter">Y</text>
+    </svg>`
+  },
+  {
+    id: 'XNOR',
+    name: 'XNOR Gate',
+    expression: "Y = (A &oplus; B)'",
+    description: 'The Exclusive-NOR (equivalence) gate outputs HIGH (1) when its inputs have matching binary values (both LOW or both HIGH). It functions as a single-bit comparator.',
+    inputs: ['A', 'B'],
+    table: [
+      { a: 0, b: 0, out: 1 },
+      { a: 0, b: 1, out: 0 },
+      { a: 1, b: 0, out: 0 },
+      { a: 1, b: 1, out: 1 }
+    ],
+    svg: `<svg width="120" height="70" viewBox="0 0 120 70" fill="none">
+      <line x1="10" y1="22" x2="48" y2="22" stroke="#a1a1aa" stroke-width="2"/>
+      <line x1="10" y1="48" x2="48" y2="48" stroke="#a1a1aa" stroke-width="2"/>
+      <path d="M34 10 Q48 35 34 60" stroke="#a1a1aa" stroke-width="2"/>
+      <path d="M42 10 Q56 35 42 60 Q70 60 92 35 Q70 10 42 10 Z" stroke="#a1a1aa" stroke-width="2" fill="#18181b"/>
+      <circle cx="97" cy="35" r="5" stroke="#a1a1aa" stroke-width="2" fill="#18181b"/>
+      <line x1="102" y1="35" x2="115" y2="35" stroke="#a1a1aa" stroke-width="2"/>
+      <text x="5" y="26" fill="#a1a1aa" font-size="12" font-family="Inter">A</text>
+      <text x="5" y="52" fill="#a1a1aa" font-size="12" font-family="Inter">B</text>
+      <text x="117" y="39" fill="#a1a1aa" font-size="12" font-family="Inter">Y</text>
+    </svg>`
   }
-}
+];
 
-function getPort(node, kind, idx) {
-  return getPorts(node).find(p => p.kind === kind && p.idx === idx) || null;
-}
+/* ─────────────────────────────────────────────────────────
+   CANVAS CIRCUIT SIMULATION ENGINE (TRUE ANSI SHAPES)
+   ───────────────────────────────────────────────────────── */
+class CircuitEngine {
+  constructor(canvasId, statusEqId, statusValId) {
+    this.canvas = document.getElementById(canvasId);
+    this.ctx = this.canvas.getContext('2d');
+    this.statusEqEl = document.getElementById(statusEqId);
+    this.statusValEl = document.getElementById(statusValId);
 
-// ─── HIT TESTING ────────────────────────────────────────────────────────────
-function hitNode(node, mx, my) {
-  const { x, y, type } = node;
-  if (type === 'INPUT') { const d = IN_R + 4; return (mx-x)**2 + (my-y)**2 <= d*d; }
-  if (type === 'OUTPUT'){ const d = OUT_R+4; return (mx-x)**2 + (my-y)**2 <= d*d; }
-  return mx >= x-GW/2-6 && mx <= x+GW/2+14 && my >= y-GH/2-6 && my <= y+GH/2+6;
-}
+    this.nodes = [];
+    this.wires = [];
+    this.nextId = 1;
 
-function hitPort(mx, my) {
-  for (let i = nodes.length-1; i >= 0; i--) {
-    for (const p of getPorts(nodes[i])) {
-      if ((mx-p.x)**2 + (my-p.y)**2 <= PH*PH) return { node: nodes[i], port: p };
+    // Interaction state
+    this.draggingNode = null;
+    this.dragOffset = { x: 0, y: 0 };
+    this.dragWire = null;
+    this.mousePos = { x: 0, y: 0 };
+
+    this.setupEvents();
+    this.resize();
+    window.addEventListener('resize', () => this.resize());
+  }
+
+  resize() {
+    const rect = this.canvas.parentElement.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
+    const dpr = window.devicePixelRatio || 1;
+    this.canvas.width = rect.width * dpr;
+    this.canvas.height = rect.height * dpr;
+    this.width = rect.width;
+    this.height = rect.height;
+    this.ctx.scale(dpr, dpr);
+    this.render();
+  }
+
+  clear() {
+    this.nodes = [];
+    this.wires = [];
+    this.dragWire = null;
+    this.draggingNode = null;
+    this.simulate();
+  }
+
+  addNode(type, label, x, y) {
+    const id = this.nextId++;
+    let width = 76, height = 48;
+    let inputCount = 2;
+    let outputCount = 1;
+
+    if (type === 'INPUT') {
+      width = 54;
+      height = 34;
+      inputCount = 0;
+      outputCount = 1;
+    } else if (type === 'OUTPUT') {
+      width = 56;
+      height = 34;
+      inputCount = 1;
+      outputCount = 0;
+    } else if (type === 'NOT') {
+      inputCount = 1;
+      outputCount = 1;
+      width = 66;
+      height = 44;
+    } else if (type === 'NAND' || type === 'NOR' || type === 'XNOR') {
+      width = 82;
+      height = 48;
+      inputCount = 2;
+      outputCount = 1;
+    } else if (type === 'XOR') {
+      width = 78;
+      height = 48;
+      inputCount = 2;
+      outputCount = 1;
     }
+
+    const node = {
+      id,
+      type,
+      label: label || type,
+      x: x !== undefined ? x : 140,
+      y: y !== undefined ? y : 120,
+      w: width,
+      h: height,
+      state: 0,
+      inputs: inputCount,
+      outputs: outputCount
+    };
+
+    this.nodes.push(node);
+    this.simulate();
+    return node;
   }
-  return null;
-}
 
-function hitTopNode(mx, my) {
-  for (let i = nodes.length-1; i >= 0; i--)
-    if (hitNode(nodes[i], mx, my)) return nodes[i];
-  return null;
-}
-
-// ─── WIRE HELPERS ───────────────────────────────────────────────────────────
-function mkWire(fromId, fpi, toId, tpi) { return { id: uid++, fromId, fpi, toId, tpi, state:0 }; }
-function clearNodeWires(id)  { wires = wires.filter(w => w.fromId !== id && w.toId !== id); }
-function clearPortWire(id, tpi) { wires = wires.filter(w => !(w.toId === id && w.tpi === tpi)); }
-
-function closestInPort(mx, my, exId) {
-  let best = null, bd = Infinity;
-  for (const n of nodes) {
-    if (n.id === exId) continue;
-    for (const p of getPorts(n)) {
-      if (p.kind !== 'in') continue;
-      const d = Math.hypot(mx-p.x, my-p.y);
-      if (d < bd) { bd = d; best = { node:n, port:p }; }
-    }
-  }
-  return bd <= SNAP ? best : null;
-}
-
-// ─── LOGIC ENGINE ───────────────────────────────────────────────────────────
-function evaluate() {
-  for (const n of nodes) if (n.type !== 'INPUT') { n.state = 0; n.expr = null; }
-
-  let changed = true, guard = nodes.length + 4;
-  while (changed && guard-- > 0) {
-    changed = false;
-    for (const n of nodes) {
-      if (n.type === 'INPUT') continue;
-      const r = evalNode(n);
-      if (r && (n.state !== r.state || n.expr !== r.expr)) {
-        n.state = r.state; n.expr = r.expr; changed = true;
+  // Exact coordinates of pins on the ANSI shape
+  getPortPos(node, isInput, portIndex) {
+    if (isInput) {
+      if (node.type === 'INPUT') {
+        return { x: node.x, y: node.y + node.h / 2 };
       }
-    }
-  }
-
-  for (const w of wires) {
-    const fn = nodes.find(n => n.id === w.fromId);
-    w.state = fn ? fn.state : 0;
-  }
-  updateStatusBar();
-}
-
-function inWire(node, pi) { return wires.find(w => w.toId === node.id && w.tpi === pi) || null; }
-function srcOf(w)          { return w ? nodes.find(n => n.id === w.fromId) : null; }
-
-function evalNode(node) {
-  if (node.type === 'NOT') {
-    const s = srcOf(inWire(node, 0));
-    if (!s || s.expr === null) return null;
-    const e = s.type !== 'INPUT' ? `(${s.expr})` : s.expr;
-    return { state: s.state ^ 1, expr: `${e}'` };
-  }
-
-  if (node.type === 'OUTPUT') {
-    const s = srcOf(inWire(node, 0));
-    if (!s || s.expr === null) return null;
-    return { state: s.state, expr: s.expr };
-  }
-
-  // Two-input gates
-  const s0 = srcOf(inWire(node, 0));
-  const s1 = srcOf(inWire(node, 1));
-  if (!s0 || !s1 || s0.expr === null || s1.expr === null) return null;
-
-  const wrap = (s, parentType) => {
-    if (s.type === 'INPUT') return s.expr;
-    if (parentType === 'AND' && (s.type === 'OR' || s.type === 'XOR')) return `(${s.expr})`;
-    return s.expr;
-  };
-
-  const e0 = wrap(s0, node.type), e1 = wrap(s1, node.type);
-
-  switch (node.type) {
-    case 'AND':  return { state: s0.state & s1.state,        expr: `${e0}${e1}` };
-    case 'OR':   return { state: s0.state | s1.state,        expr: `${e0}+${e1}` };
-    case 'NAND': return { state: (s0.state & s1.state) ^ 1,  expr: `(${e0}${e1})'` };
-    case 'NOR':  return { state: (s0.state | s1.state) ^ 1,  expr: `(${e0}+${e1})'` };
-    case 'XOR':  return { state: s0.state ^ s1.state,        expr: `${e0}⊕${e1}` };
-  }
-  return null;
-}
-
-function updateStatusBar() {
-  const out = nodes.find(n => n.type === 'OUTPUT');
-  if (!out) {
-    sbEq.textContent = 'No output connected';
-    sbEq.className = '';
-    sbVal.textContent = '';
-    sbVal.className = 'sb-val';
-    sbDot.className = 'sb-indicator';
-    return;
-  }
-  if (out.expr === null) {
-    sbEq.textContent = 'Output has no input';
-    sbEq.className = '';
-    sbVal.textContent = '';
-    sbVal.className = 'sb-val';
-    sbDot.className = 'sb-indicator';
-    return;
-  }
-  const on = out.state === 1;
-  sbEq.textContent = out.expr;
-  sbEq.className = on ? 'active' : '';
-  sbVal.textContent = `= ${out.state}`;
-  sbVal.className = on ? 'v1' : 'v0';
-  sbDot.className = on ? 'sb-indicator active' : 'sb-indicator';
-}
-
-// ─── RENDERING ──────────────────────────────────────────────────────────────
-function render() {
-  ctx.clearRect(0, 0, W, H);
-  wires.forEach(drawWire);
-  if (drag && drag.type === 'wire') {
-    const fn = nodes.find(n => n.id === drag.fromId);
-    if (fn) {
-      const fp = getPort(fn, 'out', drag.fpi);
-      if (fp) drawTmpWire(fp.x, fp.y, drag.mx, drag.my);
-    }
-  }
-  nodes.forEach(drawNode);
-}
-
-// ── Wires ────────────────────────────────────────────
-function bz(x1, y1, x2, y2) {
-  const c = Math.max(70, Math.abs(x2-x1) * 0.5);
-  ctx.moveTo(x1, y1);
-  ctx.bezierCurveTo(x1+c, y1, x2-c, y2, x2, y2);
-}
-
-function drawWire(w) {
-  const fn = nodes.find(n => n.id === w.fromId), tn = nodes.find(n => n.id === w.toId);
-  if (!fn || !tn) return;
-  const fp = getPort(fn, 'out', w.fpi), tp = getPort(tn, 'in', w.tpi);
-  if (!fp || !tp) return;
-  const on = w.state === 1;
-
-  ctx.save();
-  if (on) { ctx.shadowColor = C.wire1; ctx.shadowBlur = 8; }
-  ctx.beginPath();
-  ctx.strokeStyle = on ? C.wire1 : C.wire0;
-  ctx.lineWidth   = on ? 2 : 1.5;
-  bz(fp.x, fp.y, tp.x, tp.y);
-  ctx.stroke();
-  ctx.restore();
-}
-
-function drawTmpWire(x1, y1, x2, y2) {
-  ctx.save();
-  ctx.setLineDash([5,4]);
-  ctx.strokeStyle = C.wireTmp;
-  ctx.lineWidth   = 1.5;
-  ctx.beginPath();
-  bz(x1, y1, x2, y2);
-  ctx.stroke();
-  ctx.restore();
-}
-
-// ── Nodes ────────────────────────────────────────────
-function drawNode(n) {
-  const on = n.state === 1;
-  switch (n.type) {
-    case 'INPUT':  drawInput(n, on); break;
-    case 'OUTPUT': drawOutput(n, on); break;
-    case 'AND':    drawAND(n, on); break;
-    case 'OR':     drawOR(n, on); break;
-    case 'NOT':    drawNOT(n, on); break;
-    case 'NAND':   drawNAND(n, on); break;
-    case 'NOR':    drawNOR(n, on); break;
-    case 'XOR':    drawXOR(n, on); break;
-  }
-  getPorts(n).forEach(p => drawPort(p, on, n));
-}
-
-// Shared: stroke + fill a shape path
-function shapeStyle(on) {
-  ctx.fillStyle = C.fill;
-  ctx.fill();
-  ctx.strokeStyle = on ? C.stroke1 : C.stroke0;
-  ctx.lineWidth = on ? 1.8 : 1.4;
-  ctx.stroke();
-}
-
-// Shared: gate label text
-function gateLabel(x, y, text, on) {
-  ctx.save();
-  ctx.font = '500 9px "JetBrains Mono", monospace';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillStyle = on ? C.text1 : C.text0;
-  ctx.fillText(text, x, y);
-  ctx.restore();
-}
-
-function drawInput(n, on) {
-  ctx.save();
-  if (on) { ctx.shadowColor = C.stroke1; ctx.shadowBlur = 12; }
-  ctx.beginPath();
-  ctx.arc(n.x, n.y, IN_R, 0, Math.PI*2);
-  shapeStyle(on);
-  ctx.restore();
-
-  // Label
-  ctx.save();
-  if (on) { ctx.shadowColor = C.stroke1; ctx.shadowBlur = 8; }
-  ctx.font = '500 14px "JetBrains Mono", monospace';
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillStyle = on ? C.text1 : C.text0;
-  ctx.fillText(n.label, n.x, n.y - 2);
-  ctx.restore();
-
-  ctx.save();
-  ctx.font = '400 10px "JetBrains Mono", monospace';
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillStyle = on ? 'rgba(0,229,176,0.65)' : C.text0 + '55';
-  // Note: this appends a hex alpha — just use rgba directly
-  ctx.fillStyle = on ? 'rgba(0,229,176,0.6)' : '#383850';
-  ctx.fillText(n.state, n.x, n.y + 12);
-  ctx.restore();
-}
-
-function drawOutput(n, on) {
-  ctx.save();
-  if (on) { ctx.shadowColor = C.stroke1; ctx.shadowBlur = 16; }
-  ctx.beginPath();
-  ctx.arc(n.x, n.y, OUT_R, 0, Math.PI*2);
-  shapeStyle(on);
-  // Inner ring
-  ctx.beginPath();
-  ctx.arc(n.x, n.y, OUT_R * 0.5, 0, Math.PI*2);
-  ctx.strokeStyle = on ? 'rgba(0,229,176,0.3)' : '#1e1e32';
-  ctx.lineWidth = 1;
-  ctx.stroke();
-  ctx.restore();
-
-  ctx.save();
-  if (on) { ctx.shadowColor = C.stroke1; ctx.shadowBlur = 8; }
-  ctx.font = '500 9px "JetBrains Mono", monospace';
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillStyle = on ? C.text1 : '#4a4a62';
-  ctx.fillText('OUT', n.x, n.y - 6);
-  ctx.font = '500 13px "JetBrains Mono", monospace';
-  ctx.fillStyle = on ? C.text1 : '#383850';
-  ctx.fillText(n.state, n.x, n.y + 9);
-  ctx.restore();
-}
-
-function drawAND(n, on) {
-  const { x, y } = n;
-  const lx = x - GW/2, rx = x, hw = GH/2;
-  ctx.save();
-  if (on) { ctx.shadowColor = C.stroke1; ctx.shadowBlur = 10; }
-  ctx.beginPath();
-  ctx.moveTo(lx, y - hw);
-  ctx.lineTo(rx, y - hw);
-  ctx.arc(rx, y, hw, -Math.PI/2, Math.PI/2);
-  ctx.lineTo(lx, y + hw);
-  ctx.closePath();
-  shapeStyle(on);
-  ctx.restore();
-  gateLabel(x - GW*0.12, y, 'AND', on);
-}
-
-function drawOR(n, on) {
-  const { x, y } = n;
-  const lx = x - GW/2, rx = x + GW/2, hw = GH/2;
-  ctx.save();
-  if (on) { ctx.shadowColor = C.stroke1; ctx.shadowBlur = 10; }
-  ctx.beginPath();
-  ctx.moveTo(lx, y - hw);
-  ctx.quadraticCurveTo(lx + GW*0.28, y, lx, y + hw);
-  ctx.quadraticCurveTo(lx + GW*0.55, y + hw + 5, rx, y);
-  ctx.quadraticCurveTo(lx + GW*0.55, y - hw - 5, lx, y - hw);
-  ctx.closePath();
-  shapeStyle(on);
-  ctx.restore();
-  gateLabel(x - GW*0.06, y, 'OR', on);
-}
-
-function drawNOT(n, on) {
-  const { x, y } = n;
-  const lx = x - GW/2, hw = GH/2, bub = 6;
-  const tipX = x + GW/2 - bub * 2;
-  ctx.save();
-  if (on) { ctx.shadowColor = C.stroke1; ctx.shadowBlur = 10; }
-  ctx.beginPath();
-  ctx.moveTo(lx, y - hw);
-  ctx.lineTo(lx, y + hw);
-  ctx.lineTo(tipX, y);
-  ctx.closePath();
-  shapeStyle(on);
-  ctx.beginPath();
-  ctx.arc(tipX + bub, y, bub, 0, Math.PI*2);
-  shapeStyle(on);
-  ctx.restore();
-  gateLabel(x - GW*0.14, y, 'NOT', on);
-}
-
-function drawNAND(n, on) {
-  const { x, y } = n;
-  const lx = x - GW/2, hw = GH/2, bub = 6;
-  const rx = x + GW/2 - hw - bub * 2;
-  ctx.save();
-  if (on) { ctx.shadowColor = C.stroke1; ctx.shadowBlur = 10; }
-  ctx.beginPath();
-  ctx.moveTo(lx, y - hw);
-  ctx.lineTo(rx, y - hw);
-  ctx.arc(rx, y, hw, -Math.PI/2, Math.PI/2);
-  ctx.lineTo(lx, y + hw);
-  ctx.closePath();
-  shapeStyle(on);
-  ctx.beginPath();
-  ctx.arc(rx + hw + bub, y, bub, 0, Math.PI*2);
-  shapeStyle(on);
-  ctx.restore();
-  gateLabel(x - GW*0.12, y, 'NAND', on);
-}
-
-function drawNOR(n, on) {
-  const { x, y } = n;
-  const lx = x - GW/2, rx = x + GW/2, hw = GH/2, bub = 6;
-  const tipX = rx - bub * 2;
-  ctx.save();
-  if (on) { ctx.shadowColor = C.stroke1; ctx.shadowBlur = 10; }
-  ctx.beginPath();
-  ctx.moveTo(lx, y - hw);
-  ctx.quadraticCurveTo(lx + GW*0.28, y, lx, y + hw);
-  ctx.quadraticCurveTo(lx + GW*0.55, y + hw + 5, tipX, y);
-  ctx.quadraticCurveTo(lx + GW*0.55, y - hw - 5, lx, y - hw);
-  ctx.closePath();
-  shapeStyle(on);
-  ctx.beginPath();
-  ctx.arc(tipX + bub, y, bub, 0, Math.PI*2);
-  shapeStyle(on);
-  ctx.restore();
-  gateLabel(x - GW*0.1, y, 'NOR', on);
-}
-
-function drawXOR(n, on) {
-  const { x, y } = n;
-  const lx = x - GW/2, rx = x + GW/2, hw = GH/2;
-  ctx.save();
-  if (on) { ctx.shadowColor = C.stroke1; ctx.shadowBlur = 10; }
-  // Extra curved back line (the XOR distinguisher)
-  ctx.beginPath();
-  ctx.moveTo(lx - 6, y - hw);
-  ctx.quadraticCurveTo(lx - 6 + GW*0.28, y, lx - 6, y + hw);
-  ctx.strokeStyle = on ? C.stroke1 : C.stroke0;
-  ctx.lineWidth = on ? 1.8 : 1.4;
-  ctx.stroke();
-  // Main body (same as OR)
-  ctx.beginPath();
-  ctx.moveTo(lx, y - hw);
-  ctx.quadraticCurveTo(lx + GW*0.28, y, lx, y + hw);
-  ctx.quadraticCurveTo(lx + GW*0.55, y + hw + 5, rx, y);
-  ctx.quadraticCurveTo(lx + GW*0.55, y - hw - 5, lx, y - hw);
-  ctx.closePath();
-  shapeStyle(on);
-  ctx.restore();
-  gateLabel(x - GW*0.06, y, 'XOR', on);
-}
-
-function drawPort(p, nodeOn, node) {
-  // Gates with inversion bubbles (NOT, NAND, NOR) use the bubble as their output terminal.
-  // Skip drawing an extra port circle on their output so there are no duplicate circles.
-  if (p.kind === 'out' && (node.type === 'NOT' || node.type === 'NAND' || node.type === 'NOR')) {
-    return;
-  }
-
-  // A port is "hot" if the node output is active (for out-ports) or
-  // if an active wire connects to it (for in-ports)
-  let hot = false;
-  if (p.kind === 'out') {
-    hot = nodeOn;
-  } else {
-    hot = wires.some(w => w.toId === node.id && w.tpi === p.idx && w.state === 1);
-  }
-
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(p.x, p.y, PR, 0, Math.PI*2);
-  ctx.fillStyle   = hot ? C.portFill1 : C.portFill0;
-  ctx.fill();
-  ctx.strokeStyle = hot ? C.port1 : C.port0;
-  ctx.lineWidth   = 1.3;
-  ctx.stroke();
-  ctx.restore();
-}
-
-// ─── EVENTS ─────────────────────────────────────────────────────────────────
-function xy(e) { const r = canvas.getBoundingClientRect(); return { x: e.clientX-r.left, y: e.clientY-r.top }; }
-
-canvas.addEventListener('mousedown', e => {
-  if (e.button !== 0) return;
-  e.preventDefault();
-  const { x, y } = xy(e);
-
-  // Output port → start wire
-  const ph = hitPort(x, y);
-  if (ph && ph.port.kind === 'out') {
-    drag = { type:'wire', fromId: ph.node.id, fpi: ph.port.idx, mx: x, my: y };
-    canvas.style.cursor = 'crosshair';
-    return;
-  }
-
-  // Node → start drag
-  const n = hitTopNode(x, y);
-  if (n) {
-    const i = nodes.indexOf(n); nodes.splice(i,1); nodes.push(n);
-    drag = { type:'node', nodeId: n.id, ox: x-n.x, oy: y-n.y, sx: x, sy: y, moved: false };
-    canvas.style.cursor = 'grabbing';
-  }
-});
-
-canvas.addEventListener('mousemove', e => {
-  const { x, y } = xy(e);
-  if (drag) {
-    if (drag.type === 'node') {
-      const n = nodes.find(n => n.id === drag.nodeId);
-      if (n) {
-        if (Math.abs(x-drag.sx) > DT || Math.abs(y-drag.sy) > DT) drag.moved = true;
-        n.x = x - drag.ox; n.y = y - drag.oy;
-        evaluate(); render();
+      if (node.type === 'OUTPUT') {
+        return { x: node.x, y: node.y + node.h / 2 };
       }
+      if (node.type === 'NOT') {
+        return { x: node.x, y: node.y + node.h / 2 };
+      }
+      // 2-input gates
+      const yOffset = portIndex === 0 ? 14 : node.h - 14;
+      return { x: node.x, y: node.y + yOffset };
     } else {
-      drag.mx = x; drag.my = y; render();
+      // Output pin is at the tip of the gate shape
+      return { x: node.x + node.w, y: node.y + node.h / 2 };
     }
-    return;
   }
-  // Cursor hints
-  const ph = hitPort(x, y);
-  canvas.style.cursor = ph && ph.port.kind === 'out' ? 'crosshair'
-    : hitTopNode(x, y) ? 'grab' : 'default';
-});
 
-canvas.addEventListener('mouseup', e => {
-  const { x, y } = xy(e);
-  if (!drag) return;
-
-  if (drag.type === 'node') {
-    if (!drag.moved) {
-      const n = nodes.find(n => n.id === drag.nodeId);
-      if (n && n.type === 'INPUT') { n.state ^= 1; n.expr = n.label; }
+  findPortAt(x, y, radius = 14) {
+    for (const node of this.nodes) {
+      // Output
+      if (node.outputs > 0) {
+        const p = this.getPortPos(node, false, 0);
+        if (Math.hypot(p.x - x, p.y - y) <= radius) {
+          return { node, isInput: false, index: 0, pos: p };
+        }
+      }
+      // Inputs
+      for (let i = 0; i < node.inputs; i++) {
+        const p = this.getPortPos(node, true, i);
+        if (Math.hypot(p.x - x, p.y - y) <= radius) {
+          return { node, isInput: true, index: i, pos: p };
+        }
+      }
     }
-    drag = null;
-    canvas.style.cursor = 'default';
-    evaluate(); render();
-    return;
+    return null;
   }
 
-  if (drag.type === 'wire') {
-    const { fromId, fpi } = drag;
-    drag = null;
-    const t = closestInPort(x, y, fromId);
-    if (t && t.node.id !== fromId) {
-      clearPortWire(t.node.id, t.port.idx);
-      wires.push(mkWire(fromId, fpi, t.node.id, t.port.idx));
+  findNodeAt(x, y) {
+    for (let i = this.nodes.length - 1; i >= 0; i--) {
+      const n = this.nodes[i];
+      if (x >= n.x && x <= n.x + n.w && y >= n.y && y <= n.y + n.h) {
+        return n;
+      }
     }
-    canvas.style.cursor = 'default';
-    evaluate(); render();
+    return null;
   }
-});
 
-canvas.addEventListener('mouseleave', () => {
-  if (drag && drag.type === 'wire') { drag = null; render(); }
-});
+  findWireAt(x, y, tol = 8) {
+    for (let i = this.wires.length - 1; i >= 0; i--) {
+      const w = this.wires[i];
+      const fromNode = this.nodes.find(n => n.id === w.fromNode);
+      const toNode = this.nodes.find(n => n.id === w.toNode);
+      if (!fromNode || !toNode) continue;
+      const p1 = this.getPortPos(fromNode, false, w.fromPort);
+      const p2 = this.getPortPos(toNode, true, w.toPort);
 
-canvas.addEventListener('contextmenu', e => {
-  e.preventDefault();
-  const { x, y } = xy(e);
-  const ph = hitPort(x, y);
-  if (ph && ph.port.kind === 'in') {
-    clearPortWire(ph.node.id, ph.port.idx);
-    evaluate(); render(); return;
+      const steps = 24;
+      const dx = Math.max(30, Math.abs(p2.x - p1.x) * 0.45);
+      const cp1x = p1.x + dx, cp1y = p1.y;
+      const cp2x = p2.x - dx, cp2y = p2.y;
+
+      for (let step = 0; step <= steps; step++) {
+        const t = step / steps;
+        const mt = 1 - t;
+        const bx = mt*mt*mt*p1.x + 3*mt*mt*t*cp1x + 3*mt*t*t*cp2x + t*t*t*p2.x;
+        const by = mt*mt*mt*p1.y + 3*mt*mt*t*cp1y + 3*mt*t*t*cp2y + t*t*t*p2.y;
+        if (Math.hypot(bx - x, by - y) <= tol) {
+          return { wire: w, index: i };
+        }
+      }
+    }
+    return null;
   }
-  const n = hitTopNode(x, y);
-  if (n) { clearNodeWires(n.id); nodes = nodes.filter(x => x.id !== n.id); evaluate(); render(); }
-});
 
-// ─── SIDEBAR BUTTONS ────────────────────────────────────────────────────────
-document.querySelectorAll('.comp-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const n = mkNode(btn.dataset.type, btn.dataset.label || btn.dataset.type,
-      W/2 + (Math.random()-.5)*220, H/2 + (Math.random()-.5)*160);
-    nodes.push(n); evaluate(); render();
-  });
-});
+  setupEvents() {
+    let downPos = { x: 0, y: 0 };
+    let didDrag = false;
 
-document.getElementById('btn-clear').addEventListener('click', () => {
-  nodes = []; wires = []; drag = null; evaluate(); render();
-});
+    this.canvas.addEventListener('mousedown', (e) => {
+      const rect = this.canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      downPos = { x, y };
+      didDrag = false;
 
-// ─── RESIZE ──────────────────────────────────────────────────────────────────
-function resize() {
-  const wrap = canvas.parentElement;
-  const dpr  = window.devicePixelRatio || 1;
-  W = wrap.clientWidth; H = wrap.clientHeight;
-  canvas.width  = W * dpr; canvas.height  = H * dpr;
-  canvas.style.width  = W + 'px'; canvas.style.height = H + 'px';
-  ctx.scale(dpr, dpr);
-  render();
+      if (e.button === 2) return;
+
+      // Check port first
+      const port = this.findPortAt(x, y, 14);
+      if (port) {
+        if (!port.isInput) {
+          this.dragWire = {
+            fromNodeId: port.node.id,
+            fromPortIndex: port.index,
+            curX: x,
+            curY: y
+          };
+          return;
+        }
+      }
+
+      // Check node
+      const node = this.findNodeAt(x, y);
+      if (node) {
+        this.draggingNode = node;
+        this.dragOffset = { x: x - node.x, y: y - node.y };
+      }
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      const rect = this.canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      this.mousePos = { x, y };
+
+      if (Math.hypot(x - downPos.x, y - downPos.y) > 3) {
+        didDrag = true;
+      }
+
+      if (this.dragWire) {
+        this.dragWire.curX = x;
+        this.dragWire.curY = y;
+        this.render();
+      } else if (this.draggingNode) {
+        this.draggingNode.x = Math.max(8, Math.min(this.width - this.draggingNode.w - 8, x - this.dragOffset.x));
+        this.draggingNode.y = Math.max(8, Math.min(this.height - this.draggingNode.h - 8, y - this.dragOffset.y));
+        this.render();
+      }
+    });
+
+    window.addEventListener('mouseup', (e) => {
+      const rect = this.canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      if (this.dragWire) {
+        // Snap to closest valid input port
+        let closestInput = null;
+        let minDist = 32;
+
+        for (const node of this.nodes) {
+          if (node.id === this.dragWire.fromNodeId) continue;
+          for (let i = 0; i < node.inputs; i++) {
+            const p = this.getPortPos(node, true, i);
+            const dist = Math.hypot(p.x - x, p.y - y);
+            if (dist < minDist) {
+              minDist = dist;
+              closestInput = { node, index: i };
+            }
+          }
+        }
+
+        if (closestInput) {
+          // Strictly 1 wire per input port
+          this.wires = this.wires.filter(w => !(w.toNode === closestInput.node.id && w.toPort === closestInput.index));
+          this.wires.push({
+            fromNode: this.dragWire.fromNodeId,
+            fromPort: this.dragWire.fromPortIndex,
+            toNode: closestInput.node.id,
+            toPort: closestInput.index
+          });
+          this.simulate();
+        }
+
+        this.dragWire = null;
+        this.render();
+      }
+
+      if (this.draggingNode) {
+        if (!didDrag && this.draggingNode.type === 'INPUT') {
+          this.draggingNode.state = this.draggingNode.state === 1 ? 0 : 1;
+          this.simulate();
+        }
+        this.draggingNode = null;
+      }
+    });
+
+    this.canvas.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      const rect = this.canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      // 1. Right click port -> disconnect
+      const port = this.findPortAt(x, y, 14);
+      if (port) {
+        if (port.isInput) {
+          this.wires = this.wires.filter(w => !(w.toNode === port.node.id && w.toPort === port.index));
+        } else {
+          this.wires = this.wires.filter(w => !(w.fromNode === port.node.id && w.fromPort === port.index));
+        }
+        this.simulate();
+        return;
+      }
+
+      // 2. Right click wire -> delete wire
+      const hitWire = this.findWireAt(x, y, 8);
+      if (hitWire) {
+        this.wires.splice(hitWire.index, 1);
+        this.simulate();
+        return;
+      }
+
+      // 3. Right click node -> delete node & wires
+      const node = this.findNodeAt(x, y);
+      if (node) {
+        this.nodes = this.nodes.filter(n => n.id !== node.id);
+        this.wires = this.wires.filter(w => w.fromNode !== node.id && w.toNode !== node.id);
+        this.simulate();
+      }
+    });
+  }
+
+  simulate() {
+    for (const node of this.nodes) {
+      if (node.type !== 'INPUT') node.state = 0;
+    }
+
+    for (let pass = 0; pass < 12; pass++) {
+      for (const node of this.nodes) {
+        if (node.type === 'INPUT') continue;
+
+        const inWires = this.wires.filter(w => w.toNode === node.id);
+        const inVals = [];
+        for (let i = 0; i < node.inputs; i++) {
+          const w = inWires.find(item => item.toPort === i);
+          if (w) {
+            const src = this.nodes.find(n => n.id === w.fromNode);
+            inVals.push(src ? src.state : 0);
+          } else {
+            inVals.push(0);
+          }
+        }
+
+        let out = 0;
+        const v0 = inVals[0] || 0;
+        const v1 = inVals[1] || 0;
+
+        switch (node.type) {
+          case 'AND':  out = (v0 && v1) ? 1 : 0; break;
+          case 'OR':   out = (v0 || v1) ? 1 : 0; break;
+          case 'NOT':  out = v0 ? 0 : 1; break;
+          case 'NAND': out = (v0 && v1) ? 0 : 1; break;
+          case 'NOR':  out = (v0 || v1) ? 0 : 1; break;
+          case 'XOR':  out = (v0 !== v1) ? 1 : 0; break;
+          case 'XNOR': out = (v0 === v1) ? 1 : 0; break;
+          case 'OUTPUT': out = v0; break;
+        }
+
+        node.state = out;
+      }
+    }
+
+    this.updateStatus();
+    this.render();
+  }
+
+  buildEquationString(node, visited = new Set()) {
+    if (!node || visited.has(node.id)) return '?';
+    visited.add(node.id);
+
+    if (node.type === 'INPUT') {
+      return node.label;
+    }
+
+    const inWires = this.wires.filter(w => w.toNode === node.id);
+    const inExpressions = [];
+    for (let i = 0; i < node.inputs; i++) {
+      const w = inWires.find(item => item.toPort === i);
+      if (w) {
+        const src = this.nodes.find(n => n.id === w.fromNode);
+        inExpressions.push(this.buildEquationString(src, new Set(visited)));
+      } else {
+        inExpressions.push('0');
+      }
+    }
+
+    const e0 = inExpressions[0] || '0';
+    const e1 = inExpressions[1] || '0';
+
+    switch (node.type) {
+      case 'OUTPUT': return e0;
+      case 'NOT':    return `(${e0})'`;
+      case 'AND':    return `(${e0} * ${e1})`;
+      case 'OR':     return `(${e0} + ${e1})`;
+      case 'NAND':   return `(${e0} * ${e1})'`;
+      case 'NOR':    return `(${e0} + ${e1})'`;
+      case 'XOR':    return `(${e0} ^ ${e1})`;
+      case 'XNOR':   return `(${e0} ^ ${e1})'`;
+      default:       return '?';
+    }
+  }
+
+  updateStatus() {
+    if (!this.statusEqEl) return;
+    const outputNode = this.nodes.find(n => n.type === 'OUTPUT');
+    if (!outputNode) {
+      this.statusEqEl.textContent = 'No output connected';
+      if (this.statusValEl) {
+        this.statusValEl.textContent = 'VALUE: —';
+        this.statusValEl.className = 'status-indicator-tag';
+      }
+      return;
+    }
+
+    const inWire = this.wires.find(w => w.toNode === outputNode.id && w.toPort === 0);
+    if (!inWire) {
+      this.statusEqEl.textContent = 'Output probe not wired';
+      if (this.statusValEl) {
+        this.statusValEl.textContent = 'VALUE: 0';
+        this.statusValEl.className = 'status-indicator-tag low';
+      }
+      return;
+    }
+
+    const src = this.nodes.find(n => n.id === inWire.fromNode);
+    const eq = this.buildEquationString(src);
+    this.statusEqEl.textContent = `Y = ${eq}`;
+
+    if (this.statusValEl) {
+      const val = outputNode.state;
+      this.statusValEl.textContent = `VALUE: ${val}`;
+      this.statusValEl.className = `status-indicator-tag ${val === 1 ? 'high' : 'low'}`;
+    }
+  }
+
+  render() {
+    const ctx = this.ctx;
+    const w = this.width;
+    const h = this.height;
+    if (!w || !h) return;
+
+    ctx.clearRect(0, 0, w, h);
+
+    // ─── Subtle dot grid ───
+    const gridSize = 24;
+    ctx.fillStyle = '#1c1c20';
+    for (let x = 12; x < w; x += gridSize) {
+      for (let y = 12; y < h; y += gridSize) {
+        ctx.fillRect(x, y, 1.5, 1.5);
+      }
+    }
+
+    // ─── Wires ───
+    ctx.shadowBlur = 0;
+    for (const wire of this.wires) {
+      const fromNode = this.nodes.find(n => n.id === wire.fromNode);
+      const toNode = this.nodes.find(n => n.id === wire.toNode);
+      if (!fromNode || !toNode) continue;
+
+      const p1 = this.getPortPos(fromNode, false, wire.fromPort);
+      const p2 = this.getPortPos(toNode, true, wire.toPort);
+      const state = fromNode.state;
+
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      const dx = Math.max(30, Math.abs(p2.x - p1.x) * 0.45);
+      ctx.bezierCurveTo(p1.x + dx, p1.y, p2.x - dx, p2.y, p2.x, p2.y);
+
+      ctx.strokeStyle = state === 1 ? '#60a5fa' : '#3f3f46';
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+    }
+
+    // ─── Dragging temporary wire ───
+    if (this.dragWire) {
+      const fromNode = this.nodes.find(n => n.id === this.dragWire.fromNodeId);
+      if (fromNode) {
+        const p1 = this.getPortPos(fromNode, false, this.dragWire.fromPortIndex);
+        const p2 = { x: this.dragWire.curX, y: this.dragWire.curY };
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        const dx = Math.max(30, Math.abs(p2.x - p1.x) * 0.45);
+        ctx.bezierCurveTo(p1.x + dx, p1.y, p2.x - dx, p2.y, p2.x, p2.y);
+        ctx.strokeStyle = '#60a5fa';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    }
+
+    // ─── Nodes ───
+    for (const node of this.nodes) {
+      this.renderNode(node);
+    }
+  }
+
+  /* ─── TRUE ANSI LOGIC GATE DRAWING (NO SURROUNDING BOXES) ─── */
+  renderNode(node) {
+    const ctx = this.ctx;
+    ctx.shadowBlur = 0;
+
+    const x = node.x;
+    const y = node.y;
+    const w = node.w;
+    const h = node.h;
+    const isDragging = this.draggingNode && this.draggingNode.id === node.id;
+
+    // ─── INPUT TERMINAL ───
+    if (node.type === 'INPUT') {
+      const boxW = 44, boxH = 32;
+      ctx.fillStyle = node.state === 1 ? '#1e293b' : '#18181b';
+      ctx.strokeStyle = node.state === 1 ? '#60a5fa' : (isDragging ? '#71717a' : '#27272a');
+      ctx.lineWidth = 1.5;
+
+      ctx.beginPath();
+      ctx.roundRect ? ctx.roundRect(x, y + 1, boxW, boxH, 4) : ctx.rect(x, y + 1, boxW, boxH);
+      ctx.fill();
+      ctx.stroke();
+
+      // Label & Value
+      ctx.fillStyle = node.state === 1 ? '#60a5fa' : '#f4f4f5';
+      ctx.font = '600 13px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(node.label, x + 14, y + 17);
+
+      ctx.fillStyle = node.state === 1 ? '#60a5fa' : '#71717a';
+      ctx.font = '600 13px "JetBrains Mono", monospace';
+      ctx.fillText(node.state.toString(), x + 31, y + 17);
+
+      // Lead line to output port
+      ctx.beginPath();
+      ctx.moveTo(x + boxW, y + 17);
+      ctx.lineTo(x + w, y + 17);
+      ctx.strokeStyle = node.state === 1 ? '#60a5fa' : '#52525b';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      this.drawPort(x + w, y + 17, false, node.state);
+      return;
+    }
+
+    // ─── OUTPUT TERMINAL ───
+    if (node.type === 'OUTPUT') {
+      const boxW = 46, boxH = 32;
+      const boxX = x + (w - boxW);
+
+      // Lead line from input port to box
+      ctx.beginPath();
+      ctx.moveTo(x, y + 17);
+      ctx.lineTo(boxX, y + 17);
+      ctx.strokeStyle = node.state === 1 ? '#60a5fa' : '#52525b';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.fillStyle = node.state === 1 ? '#1e293b' : '#18181b';
+      ctx.strokeStyle = node.state === 1 ? '#60a5fa' : (isDragging ? '#71717a' : '#27272a');
+      ctx.lineWidth = 1.5;
+
+      ctx.beginPath();
+      ctx.roundRect ? ctx.roundRect(boxX, y + 1, boxW, boxH, 4) : ctx.rect(boxX, y + 1, boxW, boxH);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#a1a1aa';
+      ctx.font = '600 11px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('OUT', boxX + 16, y + 17);
+
+      ctx.fillStyle = node.state === 1 ? '#60a5fa' : '#71717a';
+      ctx.font = '600 13px "JetBrains Mono", monospace';
+      ctx.fillText(node.state.toString(), boxX + 34, y + 17);
+
+      this.drawPort(x, y + 17, true, node.state);
+      return;
+    }
+
+    // ─── LOGIC GATES (AND, OR, NOT, NAND, NOR, XOR, XNOR) ───
+    const bodyFill = '#18181b';
+    const bodyStroke = isDragging ? '#60a5fa' : '#a1a1aa';
+
+    ctx.fillStyle = bodyFill;
+    ctx.strokeStyle = bodyStroke;
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    switch (node.type) {
+      case 'AND': {
+        const leadLen = 12;
+        const gateX = x + leadLen;
+        const gateW = w - leadLen * 2;
+        const r = h / 2;
+
+        // Draw input lead lines
+        ctx.beginPath();
+        ctx.moveTo(x, y + 14);
+        ctx.lineTo(gateX, y + 14);
+        ctx.moveTo(x, y + h - 14);
+        ctx.lineTo(gateX, y + h - 14);
+        ctx.strokeStyle = '#52525b';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Draw output lead line
+        ctx.beginPath();
+        ctx.moveTo(gateX + gateW, y + r);
+        ctx.lineTo(x + w, y + r);
+        ctx.strokeStyle = node.state === 1 ? '#60a5fa' : '#52525b';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Draw ANSI AND Body
+        ctx.beginPath();
+        ctx.moveTo(gateX, y + 2);
+        ctx.lineTo(gateX + gateW - r, y + 2);
+        ctx.arc(gateX + gateW - r, y + r, r - 2, -Math.PI / 2, Math.PI / 2);
+        ctx.lineTo(gateX, y + h - 2);
+        ctx.closePath();
+        ctx.fillStyle = bodyFill;
+        ctx.fill();
+        ctx.strokeStyle = bodyStroke;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Subtle Gate Name
+        ctx.fillStyle = '#71717a';
+        ctx.font = '500 11px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('AND', gateX + (gateW - r) / 2 + 2, y + r + 1);
+        break;
+      }
+
+      case 'OR': {
+        const leadLen = 12;
+        const gateX = x + leadLen;
+        const gateW = w - leadLen * 2;
+        const r = h / 2;
+
+        // Input leads
+        ctx.beginPath();
+        ctx.moveTo(x, y + 14);
+        ctx.lineTo(gateX + 6, y + 14);
+        ctx.moveTo(x, y + h - 14);
+        ctx.lineTo(gateX + 6, y + h - 14);
+        ctx.strokeStyle = '#52525b';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Output lead
+        ctx.beginPath();
+        ctx.moveTo(gateX + gateW, y + r);
+        ctx.lineTo(x + w, y + r);
+        ctx.strokeStyle = node.state === 1 ? '#60a5fa' : '#52525b';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Draw ANSI OR Body
+        ctx.beginPath();
+        ctx.moveTo(gateX, y + 2);
+        ctx.quadraticCurveTo(gateX + 14, y + r, gateX, y + h - 2);
+        ctx.quadraticCurveTo(gateX + gateW * 0.6, y + h - 2, gateX + gateW, y + r);
+        ctx.quadraticCurveTo(gateX + gateW * 0.6, y + 2, gateX, y + 2);
+        ctx.closePath();
+        ctx.fillStyle = bodyFill;
+        ctx.fill();
+        ctx.strokeStyle = bodyStroke;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = '#71717a';
+        ctx.font = '500 11px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('OR', gateX + gateW * 0.38, y + r + 1);
+        break;
+      }
+
+      case 'NOT': {
+        const leadLen = 10;
+        const bubbleR = 4;
+        const gateX = x + leadLen;
+        const gateW = w - leadLen * 2 - bubbleR * 2;
+        const r = h / 2;
+
+        // Input lead
+        ctx.beginPath();
+        ctx.moveTo(x, y + r);
+        ctx.lineTo(gateX, y + r);
+        ctx.strokeStyle = '#52525b';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Output lead
+        ctx.beginPath();
+        ctx.moveTo(gateX + gateW + bubbleR * 2, y + r);
+        ctx.lineTo(x + w, y + r);
+        ctx.strokeStyle = node.state === 1 ? '#60a5fa' : '#52525b';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Triangle
+        ctx.beginPath();
+        ctx.moveTo(gateX, y + 4);
+        ctx.lineTo(gateX, y + h - 4);
+        ctx.lineTo(gateX + gateW, y + r);
+        ctx.closePath();
+        ctx.fillStyle = bodyFill;
+        ctx.fill();
+        ctx.strokeStyle = bodyStroke;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Bubble
+        ctx.beginPath();
+        ctx.arc(gateX + gateW + bubbleR, y + r, bubbleR, 0, Math.PI * 2);
+        ctx.fillStyle = bodyFill;
+        ctx.fill();
+        ctx.strokeStyle = bodyStroke;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = '#71717a';
+        ctx.font = '500 10px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('NOT', gateX + gateW * 0.35, y + r + 1);
+        break;
+      }
+
+      case 'NAND': {
+        const leadLen = 10;
+        const bubbleR = 4;
+        const gateX = x + leadLen;
+        const gateW = w - leadLen * 2 - bubbleR * 2;
+        const r = h / 2;
+
+        // Input leads
+        ctx.beginPath();
+        ctx.moveTo(x, y + 14);
+        ctx.lineTo(gateX, y + 14);
+        ctx.moveTo(x, y + h - 14);
+        ctx.lineTo(gateX, y + h - 14);
+        ctx.strokeStyle = '#52525b';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Output lead
+        ctx.beginPath();
+        ctx.moveTo(gateX + gateW + bubbleR * 2, y + r);
+        ctx.lineTo(x + w, y + r);
+        ctx.strokeStyle = node.state === 1 ? '#60a5fa' : '#52525b';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // AND Body
+        ctx.beginPath();
+        ctx.moveTo(gateX, y + 2);
+        ctx.lineTo(gateX + gateW - (r - 2), y + 2);
+        ctx.arc(gateX + gateW - (r - 2), y + r, r - 2, -Math.PI / 2, Math.PI / 2);
+        ctx.lineTo(gateX, y + h - 2);
+        ctx.closePath();
+        ctx.fillStyle = bodyFill;
+        ctx.fill();
+        ctx.strokeStyle = bodyStroke;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Bubble
+        ctx.beginPath();
+        ctx.arc(gateX + gateW + bubbleR, y + r, bubbleR, 0, Math.PI * 2);
+        ctx.fillStyle = bodyFill;
+        ctx.fill();
+        ctx.strokeStyle = bodyStroke;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = '#71717a';
+        ctx.font = '500 10px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('NAND', gateX + (gateW - r) / 2 + 2, y + r + 1);
+        break;
+      }
+
+      case 'NOR': {
+        const leadLen = 10;
+        const bubbleR = 4;
+        const gateX = x + leadLen;
+        const gateW = w - leadLen * 2 - bubbleR * 2;
+        const r = h / 2;
+
+        // Input leads
+        ctx.beginPath();
+        ctx.moveTo(x, y + 14);
+        ctx.lineTo(gateX + 6, y + 14);
+        ctx.moveTo(x, y + h - 14);
+        ctx.lineTo(gateX + 6, y + h - 14);
+        ctx.strokeStyle = '#52525b';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Output lead
+        ctx.beginPath();
+        ctx.moveTo(gateX + gateW + bubbleR * 2, y + r);
+        ctx.lineTo(x + w, y + r);
+        ctx.strokeStyle = node.state === 1 ? '#60a5fa' : '#52525b';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // OR Body
+        ctx.beginPath();
+        ctx.moveTo(gateX, y + 2);
+        ctx.quadraticCurveTo(gateX + 14, y + r, gateX, y + h - 2);
+        ctx.quadraticCurveTo(gateX + gateW * 0.6, y + h - 2, gateX + gateW, y + r);
+        ctx.quadraticCurveTo(gateX + gateW * 0.6, y + 2, gateX, y + 2);
+        ctx.closePath();
+        ctx.fillStyle = bodyFill;
+        ctx.fill();
+        ctx.strokeStyle = bodyStroke;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Bubble
+        ctx.beginPath();
+        ctx.arc(gateX + gateW + bubbleR, y + r, bubbleR, 0, Math.PI * 2);
+        ctx.fillStyle = bodyFill;
+        ctx.fill();
+        ctx.strokeStyle = bodyStroke;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = '#71717a';
+        ctx.font = '500 10px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('NOR', gateX + gateW * 0.38, y + r + 1);
+        break;
+      }
+
+      case 'XOR': {
+        const leadLen = 12;
+        const gateX = x + leadLen;
+        const gateW = w - leadLen * 2;
+        const r = h / 2;
+
+        // Input leads
+        ctx.beginPath();
+        ctx.moveTo(x, y + 14);
+        ctx.lineTo(gateX + 2, y + 14);
+        ctx.moveTo(x, y + h - 14);
+        ctx.lineTo(gateX + 2, y + h - 14);
+        ctx.strokeStyle = '#52525b';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Output lead
+        ctx.beginPath();
+        ctx.moveTo(gateX + gateW, y + r);
+        ctx.lineTo(x + w, y + r);
+        ctx.strokeStyle = node.state === 1 ? '#60a5fa' : '#52525b';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Detached rear curve
+        ctx.beginPath();
+        ctx.moveTo(gateX - 4, y + 2);
+        ctx.quadraticCurveTo(gateX + 10, y + r, gateX - 4, y + h - 2);
+        ctx.strokeStyle = bodyStroke;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Main body
+        ctx.beginPath();
+        ctx.moveTo(gateX + 2, y + 2);
+        ctx.quadraticCurveTo(gateX + 16, y + r, gateX + 2, y + h - 2);
+        ctx.quadraticCurveTo(gateX + gateW * 0.65, y + h - 2, gateX + gateW, y + r);
+        ctx.quadraticCurveTo(gateX + gateW * 0.65, y + 2, gateX + 2, y + 2);
+        ctx.closePath();
+        ctx.fillStyle = bodyFill;
+        ctx.fill();
+        ctx.strokeStyle = bodyStroke;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = '#71717a';
+        ctx.font = '500 10px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('XOR', gateX + gateW * 0.42, y + r + 1);
+        break;
+      }
+
+      case 'XNOR': {
+        const leadLen = 10;
+        const bubbleR = 4;
+        const gateX = x + leadLen;
+        const gateW = w - leadLen * 2 - bubbleR * 2;
+        const r = h / 2;
+
+        // Input leads
+        ctx.beginPath();
+        ctx.moveTo(x, y + 14);
+        ctx.lineTo(gateX + 2, y + 14);
+        ctx.moveTo(x, y + h - 14);
+        ctx.lineTo(gateX + 2, y + h - 14);
+        ctx.strokeStyle = '#52525b';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Output lead
+        ctx.beginPath();
+        ctx.moveTo(gateX + gateW + bubbleR * 2, y + r);
+        ctx.lineTo(x + w, y + r);
+        ctx.strokeStyle = node.state === 1 ? '#60a5fa' : '#52525b';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Detached rear curve
+        ctx.beginPath();
+        ctx.moveTo(gateX - 4, y + 2);
+        ctx.quadraticCurveTo(gateX + 10, y + r, gateX - 4, y + h - 2);
+        ctx.strokeStyle = bodyStroke;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Main body
+        ctx.beginPath();
+        ctx.moveTo(gateX + 2, y + 2);
+        ctx.quadraticCurveTo(gateX + 16, y + r, gateX + 2, y + h - 2);
+        ctx.quadraticCurveTo(gateX + gateW * 0.65, y + h - 2, gateX + gateW, y + r);
+        ctx.quadraticCurveTo(gateX + gateW * 0.65, y + 2, gateX + 2, y + 2);
+        ctx.closePath();
+        ctx.fillStyle = bodyFill;
+        ctx.fill();
+        ctx.strokeStyle = bodyStroke;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Bubble
+        ctx.beginPath();
+        ctx.arc(gateX + gateW + bubbleR, y + r, bubbleR, 0, Math.PI * 2);
+        ctx.fillStyle = bodyFill;
+        ctx.fill();
+        ctx.strokeStyle = bodyStroke;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = '#71717a';
+        ctx.font = '500 9.5px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('XNOR', gateX + gateW * 0.42, y + r + 1);
+        break;
+      }
+    }
+
+    // Draw Input Ports
+    for (let i = 0; i < node.inputs; i++) {
+      const p = this.getPortPos(node, true, i);
+      this.drawPort(p.x, p.y, true, 0);
+    }
+
+    // Draw Output Port
+    if (node.outputs > 0) {
+      const p = this.getPortPos(node, false, 0);
+      this.drawPort(p.x, p.y, false, node.state);
+    }
+  }
+
+  drawPort(px, py, isInput, state) {
+    const ctx = this.ctx;
+    ctx.beginPath();
+    ctx.arc(px, py, 3.5, 0, Math.PI * 2);
+    ctx.fillStyle = state === 1 ? '#60a5fa' : '#121214';
+    ctx.strokeStyle = state === 1 ? '#60a5fa' : '#71717a';
+    ctx.lineWidth = 1.5;
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  // Circuit Truth-Table Evaluator for Assessment
+  evaluateTruthVector(inputsMap) {
+    const savedStates = this.nodes.map(n => ({ id: n.id, state: n.state }));
+
+    for (const node of this.nodes) {
+      if (node.type === 'INPUT') {
+        const key = node.label.trim().toUpperCase();
+        if (inputsMap[key] !== undefined) {
+          node.state = inputsMap[key];
+        }
+      } else {
+        node.state = 0;
+      }
+    }
+
+    for (let pass = 0; pass < 12; pass++) {
+      for (const node of this.nodes) {
+        if (node.type === 'INPUT') continue;
+
+        const inWires = this.wires.filter(w => w.toNode === node.id);
+        const inVals = [];
+        for (let i = 0; i < node.inputs; i++) {
+          const w = inWires.find(item => item.toPort === i);
+          if (w) {
+            const src = this.nodes.find(n => n.id === w.fromNode);
+            inVals.push(src ? src.state : 0);
+          } else {
+            inVals.push(0);
+          }
+        }
+
+        let out = 0;
+        const v0 = inVals[0] || 0;
+        const v1 = inVals[1] || 0;
+
+        switch (node.type) {
+          case 'AND':  out = (v0 && v1) ? 1 : 0; break;
+          case 'OR':   out = (v0 || v1) ? 1 : 0; break;
+          case 'NOT':  out = v0 ? 0 : 1; break;
+          case 'NAND': out = (v0 && v1) ? 0 : 1; break;
+          case 'NOR':  out = (v0 || v1) ? 0 : 1; break;
+          case 'XOR':  out = (v0 !== v1) ? 1 : 0; break;
+          case 'XNOR': out = (v0 === v1) ? 1 : 0; break;
+          case 'OUTPUT': out = v0; break;
+        }
+
+        node.state = out;
+      }
+    }
+
+    const outputNode = this.nodes.find(n => n.type === 'OUTPUT');
+    const result = outputNode ? outputNode.state : 0;
+
+    for (const item of savedStates) {
+      const n = this.nodes.find(node => node.id === item.id);
+      if (n) n.state = item.state;
+    }
+    this.render();
+
+    return result;
+  }
 }
 
-window.addEventListener('resize', resize);
-resize();
+/* ─────────────────────────────────────────────────────────
+   SPA APPLICATION CONTROLLER
+   ───────────────────────────────────────────────────────── */
+class AppController {
+  constructor() {
+    // Archives is 1st, Proving is 2nd, Practice is 3rd (last on list)
+    this.currentView = 'archives';
+    this.practiceEngine = new CircuitEngine('practice-canvas', 'practice-status-eq', 'practice-status-val');
+    this.provingEngine = new CircuitEngine('proving-canvas', 'proving-status-eq', 'proving-status-val');
 
-// ─── DEMO CIRCUIT ────────────────────────────────────────────────────────────
-(function demo() {
-  const cx = W/2, cy = H/2;
+    this.currentChallenge = null;
 
-  const nA   = mkNode('INPUT',  'A',   cx-230, cy-50);
-  const nB   = mkNode('INPUT',  'B',   cx-230, cy+50);
-  const nAnd = mkNode('AND',    'AND', cx-50,  cy);
-  const nNot = mkNode('NOT',    'NOT', cx+80,  cy);
-  const nOut = mkNode('OUTPUT', 'OUT', cx+220, cy);
+    this.initNavigation();
+    this.initSpawnButtons();
+    this.initArchives();
+    this.initProvingGrounds();
+    this.setupInitialPracticeCircuit();
+  }
 
-  nA.state = 1; nA.expr = 'A';
-  nB.state = 1; nB.expr = 'B';
+  initNavigation() {
+    const navButtons = document.querySelectorAll('.nav-tab-btn');
+    navButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const viewId = btn.getAttribute('data-view');
+        this.switchView(viewId);
+      });
+    });
+  }
 
-  nodes.push(nA, nB, nAnd, nNot, nOut);
-  wires.push(mkWire(nA.id, 0, nAnd.id, 0));
-  wires.push(mkWire(nB.id, 0, nAnd.id, 1));
-  wires.push(mkWire(nAnd.id, 0, nNot.id, 0));
-  wires.push(mkWire(nNot.id, 0, nOut.id, 0));
+  switchView(viewId) {
+    this.currentView = viewId;
 
-  evaluate(); render();
-})();
+    document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-view') === viewId);
+    });
 
-})();
+    document.querySelectorAll('.spa-view').forEach(panel => {
+      panel.classList.remove('active');
+    });
+
+    const activePanel = document.getElementById(`view-${viewId}`);
+    if (activePanel) {
+      activePanel.classList.add('active');
+    }
+
+    setTimeout(() => {
+      if (viewId === 'practice') {
+        this.practiceEngine.resize();
+      } else if (viewId === 'proving') {
+        this.provingEngine.resize();
+      }
+    }, 30);
+  }
+
+  initSpawnButtons() {
+    document.querySelectorAll('.palette-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const canvasTarget = btn.getAttribute('data-canvas');
+        const type = btn.getAttribute('data-type');
+        const label = btn.getAttribute('data-label');
+        const engine = canvasTarget === 'proving' ? this.provingEngine : this.practiceEngine;
+
+        const rx = 100 + Math.floor(Math.random() * 80);
+        const ry = 80 + Math.floor(Math.random() * 120);
+        engine.addNode(type, label, rx, ry);
+      });
+    });
+
+    document.getElementById('practice-btn-clear').addEventListener('click', () => {
+      this.practiceEngine.clear();
+    });
+
+    document.getElementById('proving-btn-clear').addEventListener('click', () => {
+      this.provingEngine.clear();
+      this.resetProvingStatus();
+    });
+  }
+
+  setupInitialPracticeCircuit() {
+    const inA = this.practiceEngine.addNode('INPUT', 'A', 60, 90);
+    const inB = this.practiceEngine.addNode('INPUT', 'B', 60, 180);
+    const gateAnd = this.practiceEngine.addNode('AND', 'AND', 200, 130);
+    const outY = this.practiceEngine.addNode('OUTPUT', 'OUT', 360, 137);
+
+    inA.state = 1;
+    inB.state = 1;
+
+    this.practiceEngine.wires.push({ fromNode: inA.id, fromPort: 0, toNode: gateAnd.id, toPort: 0 });
+    this.practiceEngine.wires.push({ fromNode: inB.id, fromPort: 0, toNode: gateAnd.id, toPort: 1 });
+    this.practiceEngine.wires.push({ fromNode: gateAnd.id, fromPort: 0, toNode: outY.id, toPort: 0 });
+
+    this.practiceEngine.simulate();
+  }
+
+  /* ─── THEORY ARCHIVES LOGIC ─── */
+  initArchives() {
+    const listEl = document.getElementById('archives-menu-list');
+    listEl.innerHTML = '';
+
+    GATE_ARCHIVES.forEach((gate, idx) => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <button class="gate-menu-btn ${idx === 0 ? 'active' : ''}" data-gate-id="${gate.id}">
+          <span>${gate.name}</span>
+          <span class="gate-menu-code">${gate.id}</span>
+        </button>
+      `;
+      listEl.appendChild(li);
+    });
+
+    listEl.addEventListener('click', (e) => {
+      const btn = e.target.closest('.gate-menu-btn');
+      if (!btn) return;
+
+      document.querySelectorAll('.gate-menu-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const gateId = btn.getAttribute('data-gate-id');
+      this.renderArchiveContent(gateId);
+    });
+
+    this.renderArchiveContent(GATE_ARCHIVES[0].id);
+  }
+
+  renderArchiveContent(gateId) {
+    const gate = GATE_ARCHIVES.find(g => g.id === gateId) || GATE_ARCHIVES[0];
+    const contentEl = document.getElementById('archives-content');
+
+    let thead = '';
+    if (gate.inputs.length === 1) {
+      thead = `<tr><th>INPUT (A)</th><th>OUTPUT (Y)</th></tr>`;
+    } else {
+      thead = `<tr><th>INPUT (A)</th><th>INPUT (B)</th><th>OUTPUT (Y)</th></tr>`;
+    }
+
+    let tbody = '';
+    gate.table.forEach(row => {
+      if (gate.inputs.length === 1) {
+        tbody += `<tr>
+          <td>${row.a}</td>
+          <td class="${row.out === 1 ? 'out-high' : ''}">${row.out}</td>
+        </tr>`;
+      } else {
+        tbody += `<tr>
+          <td>${row.a}</td>
+          <td>${row.b}</td>
+          <td class="${row.out === 1 ? 'out-high' : ''}">${row.out}</td>
+        </tr>`;
+      }
+    });
+
+    contentEl.innerHTML = `
+      <div class="dossier-header">
+        <div class="dossier-headline">
+          <h1 class="dossier-gate-title">${gate.name}</h1>
+          <div class="dossier-eq-badge">${gate.expression}</div>
+        </div>
+        <div class="dossier-symbol-box">
+          ${gate.svg}
+          <span class="symbol-meta">ANSI Standard Symbol</span>
+        </div>
+      </div>
+
+      <div class="dossier-section">
+        <h2 class="dossier-section-title">Logical Function &amp; Academic Description</h2>
+        <p class="dossier-paragraph">${gate.description}</p>
+      </div>
+
+      <div class="dossier-section">
+        <h2 class="dossier-section-title">Truth Table</h2>
+        <div class="table-card">
+          <table class="standard-truth-table">
+            <thead>${thead}</thead>
+            <tbody>${tbody}</tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  }
+
+  /* ─── PROVING GROUNDS LOGIC ─── */
+  initProvingGrounds() {
+    this.generateNewChallenge();
+
+    document.getElementById('btn-proving-new').addEventListener('click', () => {
+      this.generateNewChallenge();
+      this.provingEngine.clear();
+      this.resetProvingStatus();
+    });
+
+    document.getElementById('btn-proving-verify').addEventListener('click', () => {
+      this.verifyProvingCircuit();
+    });
+  }
+
+  generateNewChallenge() {
+    const challenges = [
+      {
+        eq: '(A * B) + C',
+        vars: ['A', 'B', 'C'],
+        eval: (a, b, c) => ((a && b) || c) ? 1 : 0
+      },
+      {
+        eq: '(A + B) * C',
+        vars: ['A', 'B', 'C'],
+        eval: (a, b, c) => ((a || b) && c) ? 1 : 0
+      },
+      {
+        eq: "(A * B)'",
+        vars: ['A', 'B'],
+        eval: (a, b) => (a && b) ? 0 : 1
+      },
+      {
+        eq: "(A + B)'",
+        vars: ['A', 'B'],
+        eval: (a, b) => (a || b) ? 0 : 1
+      },
+      {
+        eq: '(A * B) + (B * C)',
+        vars: ['A', 'B', 'C'],
+        eval: (a, b, c) => ((a && b) || (b && c)) ? 1 : 0
+      },
+      {
+        eq: "A + (B * C)'",
+        vars: ['A', 'B', 'C'],
+        eval: (a, b, c) => (a || !(b && c)) ? 1 : 0
+      },
+      {
+        eq: "(A + B) * C'",
+        vars: ['A', 'B', 'C'],
+        eval: (a, b, c) => ((a || b) && !c) ? 1 : 0
+      },
+      {
+        eq: '(A ^ B) + C',
+        vars: ['A', 'B', 'C'],
+        eval: (a, b, c) => ((a !== b) || c) ? 1 : 0
+      }
+    ];
+
+    let next;
+    do {
+      next = challenges[Math.floor(Math.random() * challenges.length)];
+    } while (this.currentChallenge && next.eq === this.currentChallenge.eq && challenges.length > 1);
+
+    this.currentChallenge = next;
+    document.getElementById('proving-target-eq').textContent = next.eq;
+    this.resetProvingStatus();
+  }
+
+  resetProvingStatus() {
+    const statusText = document.getElementById('proving-status-result');
+    const statusDetail = document.getElementById('proving-status-detail');
+    statusText.textContent = 'Ready for verification';
+    statusText.className = 'outcome-text';
+    statusDetail.textContent = "Connect inputs through gates to the output probe, then click 'Verify Circuit'.";
+  }
+
+  verifyProvingCircuit() {
+    const statusText = document.getElementById('proving-status-result');
+    const statusDetail = document.getElementById('proving-status-detail');
+
+    if (!this.currentChallenge) return;
+
+    const outNode = this.provingEngine.nodes.find(n => n.type === 'OUTPUT');
+    if (!outNode) {
+      statusText.textContent = 'Mismatch';
+      statusText.className = 'outcome-text mismatch';
+      statusDetail.textContent = 'Verification failed: No OUTPUT probe found on canvas.';
+      return;
+    }
+
+    const inWires = this.provingEngine.wires.filter(w => w.toNode === outNode.id);
+    if (inWires.length === 0) {
+      statusText.textContent = 'Mismatch';
+      statusText.className = 'outcome-text mismatch';
+      statusDetail.textContent = 'Verification failed: OUTPUT probe is not wired to any logic gate.';
+      return;
+    }
+
+    const vars = this.currentChallenge.vars;
+    const totalStates = Math.pow(2, vars.length);
+    let allPassed = true;
+    let failedVector = null;
+
+    for (let i = 0; i < totalStates; i++) {
+      const inputMap = {};
+      vars.forEach((v, vIdx) => {
+        inputMap[v] = (i >> (vars.length - 1 - vIdx)) & 1;
+      });
+
+      const expected = this.currentChallenge.eval(inputMap['A'] || 0, inputMap['B'] || 0, inputMap['C'] || 0);
+      const actual = this.provingEngine.evaluateTruthVector(inputMap);
+
+      if (expected !== actual) {
+        allPassed = false;
+        failedVector = { map: inputMap, expected, actual };
+        break;
+      }
+    }
+
+    if (allPassed) {
+      statusText.textContent = 'Pass';
+      statusText.className = 'outcome-text pass';
+      statusDetail.textContent = `All ${totalStates} truth table permutations verified successfully against target ${this.currentChallenge.eq}.`;
+    } else {
+      statusText.textContent = 'Mismatch';
+      statusText.className = 'outcome-text mismatch';
+      const vectorDesc = Object.entries(failedVector.map).map(([k, v]) => `${k}=${v}`).join(', ');
+      statusDetail.textContent = `Truth table mismatch on vector (${vectorDesc}). Expected ${failedVector.expected}, circuit evaluated to ${failedVector.actual}.`;
+    }
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  window.starkApp = new AppController();
+});
 </script>
 </body>
 </html>
