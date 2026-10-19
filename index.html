@@ -141,27 +141,33 @@ button, input, select, textarea {
   width: var(--sidebar-w);
   min-width: var(--sidebar-w);
   height: 100%;
-  background: var(--bg-panel);
+  background: rgba(18, 18, 22, 0.78);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   user-select: none;
   z-index: 10;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45), inset 1px 0 0 rgba(255, 255, 255, 0.05);
 }
 
 .panel-sidebar.left {
-  border-right: 1px solid var(--border-color);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .panel-sidebar.right {
-  border-left: 1px solid var(--border-color);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .sidebar-header {
   height: 50px;
   min-height: 50px;
   padding: 0 18px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(28, 28, 34, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -203,21 +209,26 @@ button, input, select, textarea {
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 8px 12px;
-  background: var(--bg-main);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
+  padding: 9px 12px;
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 6px;
   color: var(--text-primary);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   text-align: left;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .palette-btn:hover {
-  background: var(--bg-elevated);
-  border-color: var(--border-focus);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(96, 165, 250, 0.55);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
 }
 
 .palette-icon {
@@ -243,30 +254,35 @@ button, input, select, textarea {
 
 .sidebar-footer {
   padding: 14px;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background: var(--bg-panel);
+  background: rgba(24, 24, 30, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .btn-clear {
   width: 100%;
   padding: 9px 12px;
-  background: transparent;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
   color: var(--text-secondary);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
 
 .btn-clear:hover {
-  background: var(--bg-elevated);
+  background: rgba(255, 255, 255, 0.09);
   color: var(--text-primary);
-  border-color: var(--border-focus);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .quick-guide {
@@ -394,27 +410,33 @@ canvas.eda-canvas {
   align-items: center;
   justify-content: space-between;
   padding: 11px 14px;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
   font-size: 14px;
   font-weight: 500;
   color: var(--text-secondary);
   cursor: pointer;
   text-align: left;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.15s;
 }
 
 .gate-menu-btn:hover {
-  background: var(--bg-elevated);
+  background: rgba(255, 255, 255, 0.07);
   color: var(--text-primary);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
 }
 
 .gate-menu-btn.active {
-  background: var(--bg-elevated);
-  border-color: var(--border-focus);
-  color: var(--state-active);
+  background: rgba(96, 165, 250, 0.12);
+  border-color: rgba(96, 165, 250, 0.6);
+  color: #93c5fd;
   font-weight: 600;
+  box-shadow: 0 4px 16px rgba(96, 165, 250, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 .gate-menu-code {
@@ -564,13 +586,16 @@ canvas.eda-canvas {
 }
 
 .card-block {
-  background: var(--bg-main);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: 14px;
+  background: rgba(22, 22, 28, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 .card-label {
@@ -685,6 +710,314 @@ canvas.eda-canvas {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--border-focus);
 }
+
+/* ─── MOBILE CANVAS CONTROLS & RESPONSIVENESS ─────────── */
+.mobile-canvas-controls {
+  display: none;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  gap: 8px;
+  z-index: 25;
+  pointer-events: none;
+}
+
+.mobile-toggle-btn {
+  pointer-events: auto;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.mobile-toggle-btn:hover,
+.mobile-toggle-btn.active {
+  background: var(--bg-elevated);
+  border-color: var(--border-focus);
+  color: var(--text-primary);
+}
+
+@media (max-width: 900px) {
+  :root {
+    --sidebar-w: 260px;
+    --topbar-h: 48px;
+    --statusbar-h: 44px;
+  }
+
+  #topbar {
+    padding: 0 12px;
+  }
+
+  .brand-title {
+    font-size: 13px;
+  }
+
+  .topbar-meta {
+    display: none;
+  }
+
+  .nav-tab-btn {
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  /* Archives view on mobile */
+  #view-archives {
+    flex-direction: column;
+  }
+
+  #view-archives .panel-sidebar.left {
+    width: 100%;
+    min-width: 100%;
+    height: auto;
+    max-height: 140px;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  #view-archives .sidebar-scroll {
+    padding: 8px 12px;
+  }
+
+  #view-archives .gate-menu-list {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  #view-archives .gate-menu-btn {
+    white-space: nowrap;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .archives-dossier {
+    padding: 20px 16px;
+    gap: 20px;
+  }
+
+  .dossier-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .dossier-symbol-box {
+    min-width: 100%;
+    width: 100%;
+    padding: 16px;
+  }
+
+  /* Proving & Practice Views on mobile */
+  #view-proving,
+  #view-practice {
+    position: relative;
+  }
+
+  .panel-sidebar.left {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: var(--statusbar-h);
+    z-index: 30;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease-in-out;
+    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.5);
+  }
+
+  .panel-sidebar.left.mobile-open {
+    transform: translateX(0);
+  }
+
+  .panel-sidebar.right {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: var(--statusbar-h);
+    z-index: 30;
+    transform: translateX(100%);
+    transition: transform 0.2s ease-in-out;
+    box-shadow: -4px 0 16px rgba(0, 0, 0, 0.5);
+  }
+
+  .panel-sidebar.right.mobile-open {
+    transform: translateX(0);
+  }
+
+  .mobile-canvas-controls {
+    display: flex;
+  }
+
+  .fixed-statusbar {
+    padding: 0 12px;
+    font-size: 12px;
+  }
+
+  .status-lead {
+    font-size: 11px;
+  }
+
+  .status-expression {
+    font-size: 12px;
+  }
+
+  .status-indicator-tag {
+    font-size: 11px;
+    padding: 2px 6px;
+  }
+}
+
+/* ─── INSTRUCTIONS POPUP MODAL ───────────────────────── */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-backdrop.active {
+  display: flex;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 520px;
+  background: rgba(22, 22, 28, 0.88);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.96) translateY(6px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  background: rgba(30, 30, 38, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.modal-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--state-active);
+  letter-spacing: 0.06em;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.modal-close-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.modal-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-lead {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.modal-instructions-table {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(14, 14, 17, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  padding: 12px 16px;
+}
+
+.modal-instr-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.modal-instr-row:last-child {
+  border-bottom: none;
+}
+
+.modal-instr-action {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.modal-instr-key {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  padding: 3px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.modal-footer {
+  padding: 14px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(24, 24, 30, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  display: flex;
+  justify-content: flex-end;
+}
 </style>
 </head>
 <body>
@@ -700,7 +1033,6 @@ canvas.eda-canvas {
       <button class="nav-tab-btn" data-view="proving">Proving Grounds</button>
       <button class="nav-tab-btn" data-view="practice">Practice Sandbox</button>
     </nav>
-    <div class="topbar-meta">EDA SUITE // 2026</div>
   </header>
 
   <!-- ─── VIEW 1: THEORY ARCHIVES (FIRST ON LIST) ─────────── -->
@@ -819,6 +1151,16 @@ canvas.eda-canvas {
               </span>
               <span class="palette-name">XOR Gate</span>
             </button>
+            <button class="palette-btn" data-canvas="proving" data-type="XNOR">
+              <span class="palette-icon">
+                <svg width="24" height="16" viewBox="0 0 24 16" fill="none">
+                  <path d="M1 2 Q4 8 1 14" stroke="#a1a1aa" stroke-width="1.5"/>
+                  <path d="M4 2 Q7 8 4 14 Q10 14 17 8 Q10 2 2 2 Z" stroke="#a1a1aa" stroke-width="1.5"/>
+                  <circle cx="19.5" cy="8" r="2.5" stroke="#a1a1aa" stroke-width="1.5"/>
+                </svg>
+              </span>
+              <span class="palette-name">XNOR Gate</span>
+            </button>
           </div>
         </div>
 
@@ -846,6 +1188,10 @@ canvas.eda-canvas {
     <!-- Center Canvas Workspace -->
     <main class="canvas-workspace">
       <div class="canvas-viewport" id="proving-canvas-wrap">
+        <div class="mobile-canvas-controls">
+          <button class="mobile-toggle-btn" id="btn-toggle-proving-palette" type="button">Components &#9776;</button>
+          <button class="mobile-toggle-btn" id="btn-toggle-proving-target" type="button">Target &amp; Telemetry &#9873;</button>
+        </div>
         <canvas class="eda-canvas" id="proving-canvas"></canvas>
       </div>
       <footer class="fixed-statusbar">
@@ -1030,18 +1376,16 @@ canvas.eda-canvas {
 
       <div class="sidebar-footer">
         <button class="btn-clear" id="practice-btn-clear">Clear Workspace</button>
-        <div class="quick-guide">
-          <div class="guide-row"><span class="guide-key">Left-click input</span><span>Toggle state (0/1)</span></div>
-          <div class="guide-row"><span class="guide-key">Drag output pin</span><span>Draw wire</span></div>
-          <div class="guide-row"><span class="guide-key">Right-click gate</span><span>Delete component</span></div>
-          <div class="guide-row"><span class="guide-key">Right-click pin</span><span>Disconnect wire</span></div>
-        </div>
+        <button class="btn-clear" id="btn-open-instructions">Instructions Guide</button>
       </div>
     </aside>
 
     <!-- Main Workspace -->
     <main class="canvas-workspace">
       <div class="canvas-viewport" id="practice-canvas-wrap">
+        <div class="mobile-canvas-controls">
+          <button class="mobile-toggle-btn" id="btn-toggle-practice-palette" type="button">Components &#9776;</button>
+        </div>
         <canvas class="eda-canvas" id="practice-canvas"></canvas>
       </div>
       <footer class="fixed-statusbar">
@@ -1055,6 +1399,43 @@ canvas.eda-canvas {
       </footer>
     </main>
   </section>
+
+  <!-- ─── INSTRUCTIONS POPUP MODAL WINDOW ───────────────────── -->
+  <div id="instructions-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-badge">WORKSPACE GUIDE</span>
+          <h2 id="modal-title" class="modal-title">Circuit Controls &amp; Instructions</h2>
+        </div>
+        <button class="modal-close-btn" id="modal-close-icon" aria-label="Close Instructions">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-lead">Review the workspace controls below. Close this window to begin building and testing circuits on the canvas.</p>
+        <div class="modal-instructions-table">
+          <div class="modal-instr-row">
+            <span class="modal-instr-action">Toggle Input State (0 / 1)</span>
+            <span class="modal-instr-key">Left-click input</span>
+          </div>
+          <div class="modal-instr-row">
+            <span class="modal-instr-action">Draw Wire Connection</span>
+            <span class="modal-instr-key">Drag output pin</span>
+          </div>
+          <div class="modal-instr-row">
+            <span class="modal-instr-action">Delete Component</span>
+            <span class="modal-instr-key">Right-click gate</span>
+          </div>
+          <div class="modal-instr-row">
+            <span class="modal-instr-action">Disconnect Wire</span>
+            <span class="modal-instr-key">Right-click pin</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action-primary" id="modal-btn-confirm">Got It &mdash; Start Building</button>
+      </div>
+    </div>
+  </div>
 
 </div>
 
@@ -1222,9 +1603,227 @@ const GATE_ARCHIVES = [
 ];
 
 /* ─────────────────────────────────────────────────────────
-   CANVAS CIRCUIT SIMULATION ENGINE (TRUE ANSI SHAPES)
+   STANDALONE DATA-DRIVEN CIRCUIT EVALUATION ENGINE
+   Deterministic Topological Sort + DFS Cycle Detection
+   Supports: AND, OR, NOT, NAND, NOR, XOR, XNOR, INPUT, OUTPUT
    ───────────────────────────────────────────────────────── */
 class CircuitEngine {
+  /**
+   * Pure data-driven static evaluation of logic graph state.
+   * @param {Array} nodes - Array of circuit node objects
+   * @param {Array} wires - Array of directed wire connections
+   * @returns {Object} Updated state object containing new node values, cycle flag, and errors
+   */
+  static evaluate(nodes, wires) {
+    const nodeMap = new Map();
+    for (const n of nodes) {
+      nodeMap.set(n.id, n);
+    }
+
+    // Directed adjacency list: fromNode -> toNode
+    const adj = new Map();
+    for (const n of nodes) {
+      adj.set(n.id, []);
+    }
+    for (const w of wires) {
+      if (adj.has(w.fromNode) && nodeMap.has(w.toNode)) {
+        adj.get(w.fromNode).push(w.toNode);
+      }
+    }
+
+    // Step 1: Strict Deterministic Cycle Detection (DFS with 3-Color Marking)
+    // 0 = WHITE (unvisited), 1 = GRAY (actively in stack), 2 = BLACK (finished)
+    const color = new Map();
+    for (const n of nodes) {
+      color.set(n.id, 0);
+    }
+
+    let hasCycle = false;
+    const cycleNodes = new Set();
+
+    function dfs(u, path) {
+      color.set(u, 1);
+      path.push(u);
+
+      const neighbors = adj.get(u) || [];
+      for (const v of neighbors) {
+        if (color.get(v) === 1) {
+          hasCycle = true;
+          const idx = path.indexOf(v);
+          if (idx !== -1) {
+            for (let i = idx; i < path.length; i++) {
+              cycleNodes.add(path[i]);
+            }
+          }
+          return;
+        }
+        if (color.get(v) === 0) {
+          dfs(v, path);
+          if (hasCycle) return;
+        }
+      }
+
+      path.pop();
+      color.set(u, 2);
+    }
+
+    for (const node of nodes) {
+      if (color.get(node.id) === 0) {
+        dfs(node.id, []);
+        if (hasCycle) break;
+      }
+    }
+
+    const nodeStates = {};
+    const floatingInputs = [];
+    const errors = [];
+
+    // If combinational cycle detected, halt evaluation for that path & return cycle flag
+    if (hasCycle) {
+      errors.push('CYCLIC DEPENDENCY DETECTED');
+      for (const n of nodes) {
+        nodeStates[n.id] = (n.type === 'INPUT') ? (n.state || 0) : 0;
+        n.state = nodeStates[n.id];
+      }
+      return {
+        hasCycle: true,
+        errors,
+        nodeStates,
+        floatingInputs,
+        order: []
+      };
+    }
+
+    // Step 2: Deterministic Topological Sorting (Kahn's Algorithm)
+    const inDegree = new Map();
+    const inWiresByToNode = new Map();
+    for (const n of nodes) {
+      inDegree.set(n.id, 0);
+      inWiresByToNode.set(n.id, []);
+    }
+
+    for (const w of wires) {
+      if (nodeMap.has(w.fromNode) && nodeMap.has(w.toNode)) {
+        inDegree.set(w.toNode, (inDegree.get(w.toNode) || 0) + 1);
+        inWiresByToNode.get(w.toNode).push(w);
+      }
+    }
+
+    const queue = [];
+    for (const n of nodes) {
+      if ((inDegree.get(n.id) || 0) === 0) {
+        queue.push(n.id);
+      }
+    }
+
+    const topoOrder = [];
+    while (queue.length > 0) {
+      const u = queue.shift();
+      topoOrder.push(u);
+
+      const neighbors = adj.get(u) || [];
+      for (const v of neighbors) {
+        const curDeg = inDegree.get(v) - 1;
+        inDegree.set(v, curDeg);
+        if (curDeg === 0) {
+          queue.push(v);
+        }
+      }
+    }
+
+    // Guarantee isolated / disconnected nodes are still preserved
+    for (const n of nodes) {
+      if (!topoOrder.includes(n.id)) {
+        topoOrder.push(n.id);
+      }
+    }
+
+    // Step 3: Pure Evaluation in Exact Topological Order
+    for (const nodeId of topoOrder) {
+      const node = nodeMap.get(nodeId);
+      if (!node) continue;
+
+      if (node.type === 'INPUT') {
+        const val = (node.state === 1) ? 1 : 0;
+        nodeStates[node.id] = val;
+        node.state = val;
+        continue;
+      }
+
+      const incoming = inWiresByToNode.get(node.id) || [];
+      const inVals = [];
+      let hasFloating = false;
+
+      for (let p = 0; p < node.inputs; p++) {
+        const w = incoming.find(item => item.toPort === p);
+        if (w && nodeMap.has(w.fromNode)) {
+          const val = nodeStates[w.fromNode] !== undefined ? nodeStates[w.fromNode] : 0;
+          inVals.push(val);
+        } else {
+          // Explicitly handle floating / disconnected input port
+          hasFloating = true;
+          floatingInputs.push({
+            nodeId: node.id,
+            nodeType: node.type,
+            portIndex: p
+          });
+          inVals.push(0); // Treated as 0 but flagged internally
+        }
+      }
+      node.hasFloatingInput = hasFloating;
+
+      const v0 = inVals[0] !== undefined ? inVals[0] : 0;
+      const v1 = inVals[1] !== undefined ? inVals[1] : 0;
+      let out = 0;
+
+      switch (node.type) {
+        case 'AND':
+          out = (v0 && v1) ? 1 : 0;
+          break;
+        case 'OR':
+          out = (v0 || v1) ? 1 : 0;
+          break;
+        case 'NOT':
+          out = v0 ? 0 : 1;
+          break;
+        case 'NAND':
+          out = (v0 && v1) ? 0 : 1;
+          break;
+        case 'NOR':
+          out = (v0 || v1) ? 0 : 1;
+          break;
+        case 'XOR':
+          out = (v0 !== v1) ? 1 : 0;
+          break;
+        case 'XNOR':
+          out = (v0 === v1) ? 1 : 0;
+          break;
+        case 'OUTPUT':
+          out = v0;
+          break;
+        default:
+          out = 0;
+          break;
+      }
+
+      nodeStates[node.id] = out;
+      node.state = out;
+    }
+
+    return {
+      hasCycle: false,
+      errors,
+      nodeStates,
+      floatingInputs,
+      order: topoOrder
+    };
+  }
+}
+
+/* ─────────────────────────────────────────────────────────
+   CANVAS UI & INTERACTION CONTROLLER (LogicHUD)
+   ───────────────────────────────────────────────────────── */
+class LogicHUD {
   constructor(canvasId, statusEqId, statusValId) {
     this.canvas = document.getElementById(canvasId);
     this.ctx = this.canvas.getContext('2d');
@@ -1240,6 +1839,7 @@ class CircuitEngine {
     this.dragOffset = { x: 0, y: 0 };
     this.dragWire = null;
     this.mousePos = { x: 0, y: 0 };
+    this.lastEvalResult = null;
 
     this.setupEvents();
     this.resize();
@@ -1398,15 +1998,12 @@ class CircuitEngine {
   setupEvents() {
     let downPos = { x: 0, y: 0 };
     let didDrag = false;
+    let longPressTimer = null;
 
-    this.canvas.addEventListener('mousedown', (e) => {
-      const rect = this.canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+    const handlePointerDown = (x, y, isRightClick = false) => {
       downPos = { x, y };
       didDrag = false;
-
-      if (e.button === 2) return;
+      if (isRightClick) return;
 
       // Check port first
       const port = this.findPortAt(x, y, 14);
@@ -1428,12 +2025,9 @@ class CircuitEngine {
         this.draggingNode = node;
         this.dragOffset = { x: x - node.x, y: y - node.y };
       }
-    });
+    };
 
-    window.addEventListener('mousemove', (e) => {
-      const rect = this.canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+    const handlePointerMove = (x, y) => {
       this.mousePos = { x, y };
 
       if (Math.hypot(x - downPos.x, y - downPos.y) > 3) {
@@ -1449,15 +2043,11 @@ class CircuitEngine {
         this.draggingNode.y = Math.max(8, Math.min(this.height - this.draggingNode.h - 8, y - this.dragOffset.y));
         this.render();
       }
-    });
+    };
 
-    window.addEventListener('mouseup', (e) => {
-      const rect = this.canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
+    const handlePointerUp = (x, y) => {
       if (this.dragWire) {
-        // Snap to closest valid input port
+        // Snap to closest valid input port (minimum distance threshold 32px)
         let closestInput = null;
         let minDist = 32;
 
@@ -1474,7 +2064,7 @@ class CircuitEngine {
         }
 
         if (closestInput) {
-          // Strictly 1 wire per input port
+          // Preserve strictly 1 wire per input port mechanic
           this.wires = this.wires.filter(w => !(w.toNode === closestInput.node.id && w.toPort === closestInput.index));
           this.wires.push({
             fromNode: this.dragWire.fromNodeId,
@@ -1482,7 +2072,7 @@ class CircuitEngine {
             toNode: closestInput.node.id,
             toPort: closestInput.index
           });
-          this.simulate();
+          this.evaluateCircuit();
         }
 
         this.dragWire = null;
@@ -1492,19 +2082,14 @@ class CircuitEngine {
       if (this.draggingNode) {
         if (!didDrag && this.draggingNode.type === 'INPUT') {
           this.draggingNode.state = this.draggingNode.state === 1 ? 0 : 1;
-          this.simulate();
+          this.evaluateCircuit();
         }
         this.draggingNode = null;
       }
-    });
+    };
 
-    this.canvas.addEventListener('contextmenu', (e) => {
-      e.preventDefault();
-      const rect = this.canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      // 1. Right click port -> disconnect
+    const handleContextAction = (x, y) => {
+      // 1. Right click / long-press port -> disconnect wire
       const port = this.findPortAt(x, y, 14);
       if (port) {
         if (port.isInput) {
@@ -1512,70 +2097,111 @@ class CircuitEngine {
         } else {
           this.wires = this.wires.filter(w => !(w.fromNode === port.node.id && w.fromPort === port.index));
         }
-        this.simulate();
+        this.evaluateCircuit();
         return;
       }
 
-      // 2. Right click wire -> delete wire
+      // 2. Right click / long-press wire -> delete wire
       const hitWire = this.findWireAt(x, y, 8);
       if (hitWire) {
         this.wires.splice(hitWire.index, 1);
-        this.simulate();
+        this.evaluateCircuit();
         return;
       }
 
-      // 3. Right click node -> delete node & wires
+      // 3. Right click / long-press node -> delete node & connected wires
       const node = this.findNodeAt(x, y);
       if (node) {
         this.nodes = this.nodes.filter(n => n.id !== node.id);
         this.wires = this.wires.filter(w => w.fromNode !== node.id && w.toNode !== node.id);
-        this.simulate();
+        this.evaluateCircuit();
       }
+    };
+
+    // ─── Mouse Interactions ───
+    this.canvas.addEventListener('mousedown', (e) => {
+      const rect = this.canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      handlePointerDown(x, y, e.button === 2);
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      const rect = this.canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      handlePointerMove(x, y);
+    });
+
+    window.addEventListener('mouseup', (e) => {
+      const rect = this.canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      handlePointerUp(x, y);
+    });
+
+    this.canvas.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      const rect = this.canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      handleContextAction(x, y);
+    });
+
+    // ─── Touch Interactions (Mobile Responsive & Touch-Ready) ───
+    this.canvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length > 1) return;
+      const rect = this.canvas.getBoundingClientRect();
+      const x = e.touches[0].clientX - rect.left;
+      const y = e.touches[0].clientY - rect.top;
+
+      longPressTimer = setTimeout(() => {
+        if (!didDrag) {
+          handleContextAction(x, y);
+          this.dragWire = null;
+          this.draggingNode = null;
+        }
+      }, 550);
+
+      handlePointerDown(x, y, false);
+      e.preventDefault();
+    }, { passive: false });
+
+    window.addEventListener('touchmove', (e) => {
+      if (!this.dragWire && !this.draggingNode) return;
+      if (e.touches.length === 0) return;
+      const rect = this.canvas.getBoundingClientRect();
+      const x = e.touches[0].clientX - rect.left;
+      const y = e.touches[0].clientY - rect.top;
+
+      if (Math.hypot(x - downPos.x, y - downPos.y) > 6) {
+        clearTimeout(longPressTimer);
+      }
+      handlePointerMove(x, y);
+      e.preventDefault();
+    }, { passive: false });
+
+    window.addEventListener('touchend', (e) => {
+      clearTimeout(longPressTimer);
+      const rect = this.canvas.getBoundingClientRect();
+      const touch = e.changedTouches[0] || (e.touches.length ? e.touches[0] : null);
+      if (!touch) return;
+      const x = touch.clientX - rect.left;
+      const y = touch.clientY - rect.top;
+      handlePointerUp(x, y);
     });
   }
 
-  simulate() {
-    for (const node of this.nodes) {
-      if (node.type !== 'INPUT') node.state = 0;
-    }
-
-    for (let pass = 0; pass < 12; pass++) {
-      for (const node of this.nodes) {
-        if (node.type === 'INPUT') continue;
-
-        const inWires = this.wires.filter(w => w.toNode === node.id);
-        const inVals = [];
-        for (let i = 0; i < node.inputs; i++) {
-          const w = inWires.find(item => item.toPort === i);
-          if (w) {
-            const src = this.nodes.find(n => n.id === w.fromNode);
-            inVals.push(src ? src.state : 0);
-          } else {
-            inVals.push(0);
-          }
-        }
-
-        let out = 0;
-        const v0 = inVals[0] || 0;
-        const v1 = inVals[1] || 0;
-
-        switch (node.type) {
-          case 'AND':  out = (v0 && v1) ? 1 : 0; break;
-          case 'OR':   out = (v0 || v1) ? 1 : 0; break;
-          case 'NOT':  out = v0 ? 0 : 1; break;
-          case 'NAND': out = (v0 && v1) ? 0 : 1; break;
-          case 'NOR':  out = (v0 || v1) ? 0 : 1; break;
-          case 'XOR':  out = (v0 !== v1) ? 1 : 0; break;
-          case 'XNOR': out = (v0 === v1) ? 1 : 0; break;
-          case 'OUTPUT': out = v0; break;
-        }
-
-        node.state = out;
-      }
-    }
-
-    this.updateStatus();
+  evaluateCircuit() {
+    const result = CircuitEngine.evaluate(this.nodes, this.wires);
+    this.lastEvalResult = result;
+    this.updateStatus(result);
     this.render();
+    return result;
+  }
+
+  simulate() {
+    return this.evaluateCircuit();
   }
 
   buildEquationString(node, visited = new Set()) {
@@ -1594,12 +2220,12 @@ class CircuitEngine {
         const src = this.nodes.find(n => n.id === w.fromNode);
         inExpressions.push(this.buildEquationString(src, new Set(visited)));
       } else {
-        inExpressions.push('0');
+        inExpressions.push('?');
       }
     }
 
-    const e0 = inExpressions[0] || '0';
-    const e1 = inExpressions[1] || '0';
+    const e0 = inExpressions[0] || '?';
+    const e1 = inExpressions[1] || '?';
 
     switch (node.type) {
       case 'OUTPUT': return e0;
@@ -1614,8 +2240,29 @@ class CircuitEngine {
     }
   }
 
-  updateStatus() {
+  updateStatus(evalResult = this.lastEvalResult) {
     if (!this.statusEqEl) return;
+
+    // Check for cyclic dependency error reported by CircuitEngine
+    if (evalResult && evalResult.hasCycle) {
+      this.statusEqEl.textContent = '[ ERROR: CYCLIC DEPENDENCY DETECTED ]';
+      this.statusEqEl.style.color = '#ef4444';
+      if (this.statusValEl) {
+        this.statusValEl.textContent = 'ERR: CYCLE';
+        this.statusValEl.className = 'status-indicator-tag';
+        this.statusValEl.style.color = '#ef4444';
+        this.statusValEl.style.borderColor = '#ef4444';
+      }
+      return;
+    }
+
+    // Restore standard status styling
+    this.statusEqEl.style.color = '';
+    if (this.statusValEl) {
+      this.statusValEl.style.color = '';
+      this.statusValEl.style.borderColor = '';
+    }
+
     const outputNode = this.nodes.find(n => n.type === 'OUTPUT');
     if (!outputNode) {
       this.statusEqEl.textContent = 'No output connected';
@@ -1789,6 +2436,7 @@ class CircuitEngine {
       ctx.fillText(node.state.toString(), boxX + 34, y + 17);
 
       this.drawPort(x, y + 17, true, node.state);
+      this.drawNodeEquation(node);
       return;
     }
 
@@ -2177,6 +2825,46 @@ class CircuitEngine {
       const p = this.getPortPos(node, false, 0);
       this.drawPort(p.x, p.y, false, node.state);
     }
+
+    // Display the formed Boolean equation just above the gate diagram
+    this.drawNodeEquation(node);
+  }
+
+  drawNodeEquation(node) {
+    if (node.type === 'INPUT') return;
+    const inWires = this.wires.filter(w => w.toNode === node.id);
+    if (inWires.length === 0) return;
+
+    const eqText = this.buildEquationString(node);
+    if (!eqText || eqText === '?') return;
+
+    const displayText = (node.type === 'OUTPUT') ? `Y = ${eqText}` : eqText;
+
+    const ctx = this.ctx;
+    ctx.save();
+    ctx.font = '600 11px "JetBrains Mono", monospace';
+    const textMetrics = ctx.measureText(displayText);
+    const textW = textMetrics.width;
+    const badgeW = Math.max(30, textW + 12);
+    const badgeH = 18;
+    const badgeX = node.x + (node.w - badgeW) / 2;
+    const badgeY = Math.max(3, node.y - 23);
+
+    // Brutalist dark container with state-colored border when active
+    ctx.fillStyle = '#18181b';
+    ctx.strokeStyle = node.state === 1 ? '#60a5fa' : '#27272a';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 3) : ctx.rect(badgeX, badgeY, badgeW, badgeH);
+    ctx.fill();
+    ctx.stroke();
+
+    // Equation label text
+    ctx.fillStyle = node.state === 1 ? '#60a5fa' : '#a1a1aa';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(displayText, node.x + node.w / 2, badgeY + badgeH / 2);
+    ctx.restore();
   }
 
   drawPort(px, py, isInput, state) {
@@ -2205,43 +2893,9 @@ class CircuitEngine {
       }
     }
 
-    for (let pass = 0; pass < 12; pass++) {
-      for (const node of this.nodes) {
-        if (node.type === 'INPUT') continue;
-
-        const inWires = this.wires.filter(w => w.toNode === node.id);
-        const inVals = [];
-        for (let i = 0; i < node.inputs; i++) {
-          const w = inWires.find(item => item.toPort === i);
-          if (w) {
-            const src = this.nodes.find(n => n.id === w.fromNode);
-            inVals.push(src ? src.state : 0);
-          } else {
-            inVals.push(0);
-          }
-        }
-
-        let out = 0;
-        const v0 = inVals[0] || 0;
-        const v1 = inVals[1] || 0;
-
-        switch (node.type) {
-          case 'AND':  out = (v0 && v1) ? 1 : 0; break;
-          case 'OR':   out = (v0 || v1) ? 1 : 0; break;
-          case 'NOT':  out = v0 ? 0 : 1; break;
-          case 'NAND': out = (v0 && v1) ? 0 : 1; break;
-          case 'NOR':  out = (v0 || v1) ? 0 : 1; break;
-          case 'XOR':  out = (v0 !== v1) ? 1 : 0; break;
-          case 'XNOR': out = (v0 === v1) ? 1 : 0; break;
-          case 'OUTPUT': out = v0; break;
-        }
-
-        node.state = out;
-      }
-    }
-
+    const evalResult = CircuitEngine.evaluate(this.nodes, this.wires);
     const outputNode = this.nodes.find(n => n.type === 'OUTPUT');
-    const result = outputNode ? outputNode.state : 0;
+    const result = (outputNode && !evalResult.hasCycle) ? outputNode.state : 0;
 
     for (const item of savedStates) {
       const n = this.nodes.find(node => node.id === item.id);
@@ -2260,12 +2914,15 @@ class AppController {
   constructor() {
     // Archives is 1st, Proving is 2nd, Practice is 3rd (last on list)
     this.currentView = 'archives';
-    this.practiceEngine = new CircuitEngine('practice-canvas', 'practice-status-eq', 'practice-status-val');
-    this.provingEngine = new CircuitEngine('proving-canvas', 'proving-status-eq', 'proving-status-val');
+    this.practiceEngine = new LogicHUD('practice-canvas', 'practice-status-eq', 'practice-status-val');
+    this.provingEngine = new LogicHUD('proving-canvas', 'proving-status-eq', 'proving-status-val');
 
     this.currentChallenge = null;
+    this.hasSeenInstructions = false;
 
     this.initNavigation();
+    this.initMobileToggles();
+    this.initInstructionsModal();
     this.initSpawnButtons();
     this.initArchives();
     this.initProvingGrounds();
@@ -2280,6 +2937,86 @@ class AppController {
         this.switchView(viewId);
       });
     });
+  }
+
+  initInstructionsModal() {
+    const modal = document.getElementById('instructions-modal');
+    const openBtn = document.getElementById('btn-open-instructions');
+    const closeIcon = document.getElementById('modal-close-icon');
+    const confirmBtn = document.getElementById('modal-btn-confirm');
+
+    if (openBtn) {
+      openBtn.addEventListener('click', () => this.openInstructionsModal());
+    }
+
+    if (closeIcon) {
+      closeIcon.addEventListener('click', () => this.closeInstructionsModal());
+    }
+
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', () => this.closeInstructionsModal());
+    }
+
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          this.closeInstructionsModal();
+        }
+      });
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
+        this.closeInstructionsModal();
+      }
+    });
+  }
+
+  openInstructionsModal() {
+    const modal = document.getElementById('instructions-modal');
+    if (modal) {
+      modal.classList.add('active');
+    }
+  }
+
+  closeInstructionsModal() {
+    const modal = document.getElementById('instructions-modal');
+    if (modal) {
+      modal.classList.remove('active');
+    }
+  }
+
+  initMobileToggles() {
+    const toggleProvingPalette = document.getElementById('btn-toggle-proving-palette');
+    const toggleProvingTarget = document.getElementById('btn-toggle-proving-target');
+    const togglePracticePalette = document.getElementById('btn-toggle-practice-palette');
+
+    const provingLeftSidebar = document.querySelector('#view-proving .panel-sidebar.left');
+    const provingRightSidebar = document.querySelector('#view-proving .panel-sidebar.right');
+    const practiceLeftSidebar = document.querySelector('#view-practice .panel-sidebar.left');
+
+    if (toggleProvingPalette && provingLeftSidebar) {
+      toggleProvingPalette.addEventListener('click', (e) => {
+        e.stopPropagation();
+        provingLeftSidebar.classList.toggle('mobile-open');
+        if (provingRightSidebar) provingRightSidebar.classList.remove('mobile-open');
+      });
+    }
+
+    if (toggleProvingTarget && provingRightSidebar) {
+      toggleProvingTarget.addEventListener('click', (e) => {
+        e.stopPropagation();
+        provingRightSidebar.classList.toggle('mobile-open');
+        if (provingLeftSidebar) provingLeftSidebar.classList.remove('mobile-open');
+      });
+    }
+
+    if (togglePracticePalette && practiceLeftSidebar) {
+      togglePracticePalette.addEventListener('click', (e) => {
+        e.stopPropagation();
+        practiceLeftSidebar.classList.toggle('mobile-open');
+      });
+    }
   }
 
   switchView(viewId) {
@@ -2301,6 +3038,10 @@ class AppController {
     setTimeout(() => {
       if (viewId === 'practice') {
         this.practiceEngine.resize();
+        if (!this.hasSeenInstructions) {
+          this.openInstructionsModal();
+          this.hasSeenInstructions = true;
+        }
       } else if (viewId === 'proving') {
         this.provingEngine.resize();
       }
@@ -2318,6 +3059,9 @@ class AppController {
         const rx = 100 + Math.floor(Math.random() * 80);
         const ry = 80 + Math.floor(Math.random() * 120);
         engine.addNode(type, label, rx, ry);
+
+        // Auto-close mobile drawer on item add to ensure visibility on mobile
+        document.querySelectorAll('.panel-sidebar.mobile-open').forEach(sb => sb.classList.remove('mobile-open'));
       });
     });
 
@@ -2566,8 +3310,110 @@ class AppController {
   }
 }
 
+/* ─────────────────────────────────────────────────────────
+   AUTOMATED TEST SUITE (CONSOLE VERIFICATION)
+   ───────────────────────────────────────────────────────── */
+class CircuitEngineTests {
+  static runAll() {
+    console.group('%c[CIRCUIT ENGINE VERIFICATION SUITE]', 'color: #60a5fa; font-weight: bold; font-family: monospace;');
+    let passed = 0;
+    let failed = 0;
+
+    const assertTest = (condition, description) => {
+      console.assert(condition, `[TEST FAIL] ${description}`);
+      if (condition) {
+        console.log(`%c[TEST PASS] ${description}`, 'color: #60a5fa; font-family: monospace;');
+        passed++;
+      } else {
+        console.error(`%c[TEST FAIL] ${description}`, 'color: #ef4444; font-family: monospace; font-weight: bold;');
+        failed++;
+      }
+    };
+
+    // 1. Truth Table Tests for All 7 Standard Logic Gates
+    const truthTables = {
+      AND:  [[0,0,0], [0,1,0], [1,0,0], [1,1,1]],
+      OR:   [[0,0,0], [0,1,1], [1,0,1], [1,1,1]],
+      NOT:  [[0,1], [1,0]],
+      NAND: [[0,0,1], [0,1,1], [1,0,1], [1,1,0]],
+      NOR:  [[0,0,1], [0,1,0], [1,0,0], [1,1,0]],
+      XOR:  [[0,0,0], [0,1,1], [1,0,1], [1,1,0]],
+      XNOR: [[0,0,1], [0,1,0], [1,0,0], [1,1,1]]
+    };
+
+    for (const [gateType, table] of Object.entries(truthTables)) {
+      let gatePassed = true;
+      for (const row of table) {
+        if (gateType === 'NOT') {
+          const [inA, expected] = row;
+          const nodes = [
+            { id: 1, type: 'INPUT', label: 'A', state: inA, inputs: 0, outputs: 1 },
+            { id: 2, type: 'NOT', label: 'NOT', state: 0, inputs: 1, outputs: 1 }
+          ];
+          const wires = [{ fromNode: 1, fromPort: 0, toNode: 2, toPort: 0 }];
+          const res = CircuitEngine.evaluate(nodes, wires);
+          if (res.nodeStates[2] !== expected) gatePassed = false;
+        } else {
+          const [inA, inB, expected] = row;
+          const nodes = [
+            { id: 1, type: 'INPUT', label: 'A', state: inA, inputs: 0, outputs: 1 },
+            { id: 2, type: 'INPUT', label: 'B', state: inB, inputs: 0, outputs: 1 },
+            { id: 3, type: gateType, label: gateType, state: 0, inputs: 2, outputs: 1 }
+          ];
+          const wires = [
+            { fromNode: 1, fromPort: 0, toNode: 3, toPort: 0 },
+            { fromNode: 2, fromPort: 0, toNode: 3, toPort: 1 }
+          ];
+          const res = CircuitEngine.evaluate(nodes, wires);
+          if (res.nodeStates[3] !== expected) gatePassed = false;
+        }
+      }
+      assertTest(gatePassed, `${gateType} Gate evaluated correctly against truth table`);
+    }
+
+    // 2. Disconnected / Floating Inputs Test
+    {
+      const nodes = [
+        { id: 1, type: 'INPUT', label: 'A', state: 1, inputs: 0, outputs: 1 },
+        { id: 2, type: 'AND', label: 'AND', state: 0, inputs: 2, outputs: 1 }
+      ];
+      // Pin 0 connected to 1, Pin 1 is disconnected (floating)
+      const wires = [{ fromNode: 1, fromPort: 0, toNode: 2, toPort: 0 }];
+      const res = CircuitEngine.evaluate(nodes, wires);
+      const isFloatingHandled = !res.hasCycle && res.floatingInputs.length === 1 && res.nodeStates[2] === 0;
+      assertTest(isFloatingHandled, 'Disconnected/floating inputs handled safely as 0 with internal flagging');
+    }
+
+    // 3. Cyclic Dependency Test (Feedback Loop)
+    {
+      const nodes = [
+        { id: 1, type: 'NOT', label: 'NOT_A', state: 0, inputs: 1, outputs: 1 },
+        { id: 2, type: 'NOT', label: 'NOT_B', state: 0, inputs: 1, outputs: 1 }
+      ];
+      // Feedback loop: NOT_A -> NOT_B -> NOT_A
+      const wires = [
+        { fromNode: 1, fromPort: 0, toNode: 2, toPort: 0 },
+        { fromNode: 2, fromPort: 0, toNode: 1, toPort: 0 }
+      ];
+      const res = CircuitEngine.evaluate(nodes, wires);
+      const isCycleDetected = res.hasCycle === true && res.errors.includes('CYCLIC DEPENDENCY DETECTED');
+      assertTest(isCycleDetected, 'Deterministic cycle detection successfully caught infinite feedback loop');
+    }
+
+    console.log(`%c[TEST SUITE] Completed: ${passed} passed, ${failed} failed.`, 'color: #a1a1aa; font-family: monospace; font-weight: bold;');
+    console.groupEnd();
+    return { passed, failed };
+  }
+}
+
+window.CircuitEngine = CircuitEngine;
+window.LogicHUD = LogicHUD;
+window.CircuitEngineTests = CircuitEngineTests;
+
 window.addEventListener('DOMContentLoaded', () => {
   window.starkApp = new AppController();
+  // Automatically execute verification test suite in browser console
+  CircuitEngineTests.runAll();
 });
 </script>
 </body>
